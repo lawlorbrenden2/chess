@@ -7,21 +7,26 @@ import java.util.List;
 public class BishopMovesCalculator implements PieceMovesCalculator {
 
     @Override
-    public Collection<ChessMove> calcMoves(ChessBoard board, ChessPosition startingPosition) {
-         Collection<ChessMove> moves = new ArrayList<>();
-         int startRow = startingPosition.getRow();
-         int startCol = startingPosition.getColumn();
+    public Collection<ChessMove> calcMoves(ChessBoard board, ChessPosition startPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
 
-         moves.addAll(calcMovesHelper(startRow, startCol, 1, 1));
-         moves.addAll(calcMovesHelper(startRow, startCol, 1, -1));
-         moves.addAll(calcMovesHelper(startRow, startCol, -1, 1));
-         moves.addAll(calcMovesHelper(startRow, startCol, -1, -1));
+        moves.addAll(calcMovesHelper(board, startPosition, 1, 1));
+        moves.addAll(calcMovesHelper(board, startPosition, 1, -1));
+        moves.addAll(calcMovesHelper(board, startPosition, -1, 1));
+        moves.addAll(calcMovesHelper(board, startPosition, -1, -1));
 
-         return moves;
-    }
+        return moves;
+            }
 
-    private Collection<ChessMove> calcMovesHelper(int startRow, int startCol, int rowDirection, int colDirection) {
+    private Collection<ChessMove> calcMovesHelper(
+            ChessBoard board,
+            ChessPosition startingPosition,
+            int rowDirection,
+            int colDirection) {
+
         Collection<ChessMove> movesByDirection = new ArrayList<>();
+        int startRow = startingPosition.getRow();
+        int startCol = startingPosition.getColumn();
         int currentRow = startRow;
         int currentCol = startCol;
 
@@ -31,7 +36,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             currentRow += rowDirection;
             currentCol += colDirection;
             movesByDirection.add(new ChessMove(startingPosition, new ChessPosition(currentRow, currentCol), null));
-            isOnBoard = (currentRow >= 1) && (currentRow <= 8) && (currentCol >= 1 ) && (currentCol <= 8);
+            isOnBoard = (currentRow > 1) && (currentRow < 8) && (currentCol > 1 ) && (currentCol < 8);
         }
         return movesByDirection;
     }
