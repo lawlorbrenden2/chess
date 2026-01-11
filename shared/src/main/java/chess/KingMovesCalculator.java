@@ -46,18 +46,18 @@ public class KingMovesCalculator implements PieceMovesCalculator {
         Collection<ChessMove> movesByDirection = new ArrayList<>();
         ChessPiece movingPiece = board.getPiece(startingPosition);
         ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
-        int currentRow = startingPosition.getRow() + rowDirection;
-        int currentCol = startingPosition.getColumn() + colDirection;
+        int targetRow = startingPosition.getRow() + rowDirection;
+        int targetCol = startingPosition.getColumn() + colDirection;
 
-        if (!isOnBoard(currentRow, currentCol)) {
+        if (!isOnBoard(targetRow, targetCol)) {
             return movesByDirection;
         }
 
-        ChessPosition currentPosition = new ChessPosition(currentRow, currentCol);
-        ChessPiece pieceAtPosition = board.getPiece((currentPosition));
+        ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
+        ChessPiece pieceAtPosition = board.getPiece((targetPosition));
 
         if (pieceAtPosition == null || pieceAtPosition.getTeamColor() != teamColor) {
-            movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
+            movesByDirection.add(new ChessMove(startingPosition, targetPosition, null));
         }
         return movesByDirection;
 }

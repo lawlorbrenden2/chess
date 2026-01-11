@@ -43,26 +43,26 @@ public class RookMovesCalculator implements PieceMovesCalculator {
         ChessPiece movingPiece = board.getPiece(startingPosition);
         ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
 
-        int currentRow = startingPosition.getRow();
-        int currentCol = startingPosition.getColumn();
+        int targetRow = startingPosition.getRow();
+        int targetCol = startingPosition.getColumn();
 
         while (true) {
-            currentRow += rowDirection;
-            currentCol += colDirection;
+            targetRow += rowDirection;
+            targetCol += colDirection;
 
-            if (!isOnBoard(currentRow, currentCol)) {
+            if (!isOnBoard(targetRow, targetCol)) {
                 break;
             }
 
-            ChessPosition currentPosition = new ChessPosition(currentRow, currentCol);
-            ChessPiece pieceAtPosition = board.getPiece((currentPosition));
+            ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
+            ChessPiece pieceAtPosition = board.getPiece((targetPosition));
 
             if (pieceAtPosition == null) {
-                movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
+                movesByDirection.add(new ChessMove(startingPosition, targetPosition, null));
             } else if (pieceAtPosition.getTeamColor() == teamColor) {
                 break;
             } else {
-                movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
+                movesByDirection.add(new ChessMove(startingPosition, targetPosition, null));
                 break;
             }
         }
