@@ -40,7 +40,51 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        clearBoard();
+        setPawns();
+        setBackRank(1, ChessGame.TeamColor.WHITE);
+        setBackRank(8, ChessGame.TeamColor.BLACK);
+    }
+
+    /**
+     * Clears the board to a clean state
+     *
+     */
+    private void clearBoard() {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                squares[row-1][col-1] = null;
+            }
+        }
+    }
+
+    /**
+     * Sets the pawns in their starting positions
+     *
+     */
+    private void setPawns() {
+        for (int col = 1; col <= 8; col++) {
+            addPiece(new ChessPosition(2, col), new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN));
+            addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN ));
+        }
+    }
+
+
+    /**
+     * Sets the remaining pieces in their starting positions
+     *
+     * @param row Either 1 or 8 for the white and black back ranks
+     * @param teamColor Color of the piece being set
+     */
+    private void setBackRank(int row, ChessGame.TeamColor teamColor) {
+        addPiece(new ChessPosition(row, 1), new ChessPiece(teamColor, ChessPiece.PieceType.ROOK));
+        addPiece(new ChessPosition(row, 2), new ChessPiece(teamColor, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(row, 3), new ChessPiece(teamColor, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(row, 4), new ChessPiece(teamColor, ChessPiece.PieceType.QUEEN));
+        addPiece(new ChessPosition(row, 5), new ChessPiece(teamColor, ChessPiece.PieceType.KING));
+        addPiece(new ChessPosition(row, 6), new ChessPiece(teamColor, ChessPiece.PieceType.BISHOP));
+        addPiece(new ChessPosition(row, 7), new ChessPiece(teamColor, ChessPiece.PieceType.KNIGHT));
+        addPiece(new ChessPosition(row, 8), new ChessPiece(teamColor, ChessPiece.PieceType.ROOK));
     }
 
     @Override
