@@ -16,7 +16,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         moves.addAll(calcMovesHelper(board, startPosition, -1, -1));
 
         return moves;
-            }
+    }
 
     private Collection<ChessMove> calcMovesHelper(
             ChessBoard board,
@@ -24,20 +24,38 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             int rowDirection,
             int colDirection) {
 
+        ChessPiece movingPiece = board.getPiece(startingPosition);
+        ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
         Collection<ChessMove> movesByDirection = new ArrayList<>();
         int startRow = startingPosition.getRow();
         int startCol = startingPosition.getColumn();
         int currentRow = startRow;
         int currentCol = startCol;
 
-        boolean isOnBoard = true;
-
-        while (isOnBoard) {
+        while (true) {
             currentRow += rowDirection;
             currentCol += colDirection;
-            movesByDirection.add(new ChessMove(startingPosition, new ChessPosition(currentRow, currentCol), null));
-            isOnBoard = (currentRow > 1) && (currentRow < 8) && (currentCol > 1 ) && (currentCol < 8);
+
+            if (!isOnBoard(currentRow, currentCol)) {
+                break;
+            }
+
+            ChessPosition currentPosition = new ChessPosition(currentRow, currentCol);
+            ChessPiece pieceAtPosition = board.getPiece((currentPosition));
+
+            if (pieceAtPosition == null) {
+                movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
+            } else if (pieceAtPosition.getTeamColor() == teamColor) {
+                break;
+            } else {
+                movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
+                break;
+            }
         }
         return movesByDirection;
+    }
+
+    private boolean isOnBoard(int row, int col) {
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 }
