@@ -29,7 +29,14 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         return moves;
     }
 
-
+    /**
+     * Adds a single forward move for a pawn.
+     *
+     * @param board the chess board containing all the pieces
+     * @param startPosition the current position of the pawn
+     * @param forward the direction of the pawn
+     * @param moves array of possible moves
+     */
     private void addForwardMove(
             ChessBoard board,
             ChessPosition startPosition,
@@ -51,6 +58,14 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         }
     }
 
+    /**
+     * Adds a double move for a pawn.
+     *
+     * @param board the chess board containing all the pieces
+     * @param startPosition the current position of the pawn
+     * @param forward the direction of the pawn
+     * @param moves array of possible pawn moves
+     */
     private void addDoubleMove(
             ChessBoard board,
             ChessPosition startPosition,
@@ -78,6 +93,15 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     }
 
 
+    /**
+     *
+     * Adds diagonal captures for a pawn.
+     * @param board the chess board containing all the pieces
+     * @param startPosition the current position of the pawn
+     * @param forward the direction the pawn is moving
+     * @param moves array of possible moves
+     * @param teamColor color of the pawn
+     */
     private void addDiagonalCaptures(ChessBoard board,
             ChessPosition startPosition,
             int forward,
@@ -103,6 +127,13 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         }
     }
 
+    /**
+     * Adds all possible promotion moves for a pawn.
+     *
+     * @param startPosition the current position of the pawn
+     * @param targetPosition the target position of the pawn
+     * @param moves array of possible moves
+     */
         private void addPromotionMoves(
                 ChessPosition startPosition,
                 ChessPosition targetPosition,
@@ -125,7 +156,15 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
             return row >= 1 && row <= 8 && col >= 1 && col <= 8;
         }
 
-        private boolean isPromotionRow(int row, int forward) {
+
+    /**
+     * Determines if a row is a promotion row
+     *
+     * @param row the row of the board
+     * @param forward the direction the pawn is moving
+     * @return
+     */
+    private boolean isPromotionRow(int row, int forward) {
             return (forward == 1 && row == 8) || (forward == -1 && row == 1);
         }
 
