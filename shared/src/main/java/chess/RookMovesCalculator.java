@@ -23,9 +23,9 @@ public class RookMovesCalculator implements PieceMovesCalculator {
             int rowDirection,
             int colDirection) {
 
+        Collection<ChessMove> movesByDirection = new ArrayList<>();
         ChessPiece movingPiece = board.getPiece(startingPosition);
         ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
-        Collection<ChessMove> movesByDirection = new ArrayList<>();
         int startRow = startingPosition.getRow();
         int startCol = startingPosition.getColumn();
         int currentRow = startRow;

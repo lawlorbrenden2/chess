@@ -1,11 +1,52 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class KingMovesCalculator implements PieceMovesCalculator {
     @Override
-    public Collection<ChessMove> calcMoves(ChessBoard board, ChessPosition myPosition) {
-        return List.of();
+    public Collection<ChessMove> calcMoves(ChessBoard board, ChessPosition startPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
+
+        moves.addAll(calcMovesHelper(board, startPosition, 1, 1));
+        moves.addAll(calcMovesHelper(board, startPosition, 1, -1));
+        moves.addAll(calcMovesHelper(board, startPosition, -1, 1));
+        moves.addAll(calcMovesHelper(board, startPosition, -1, -1));
+        moves.addAll(calcMovesHelper(board, startPosition, 1, 0));
+        moves.addAll(calcMovesHelper(board, startPosition, 0, 1));
+        moves.addAll(calcMovesHelper(board, startPosition, -1, 0));
+        moves.addAll(calcMovesHelper(board, startPosition, 0, -1));
+
+        return moves;
+    }
+
+    private Collection<ChessMove> calcMovesHelper(
+            ChessBoard board,
+            ChessPosition startingPosition,
+            int rowDirection,
+            int colDirection) {
+
+        Collection<ChessMove> movesByDirection = new ArrayList<>();
+        ChessPiece movingPiece = board.getPiece(startingPosition);
+        ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
+        int currentRow = startingPosition.getRow() + rowDirection;
+        int currentCol = startingPosition.getColumn() + colDirection;
+
+        if (!isOnBoard(currentRow, currentCol)) {
+            return movesByDirection;
+        }
+
+        ChessPosition currentPosition = new ChessPosition(currentRow, currentCol);
+        ChessPiece pieceAtPosition = board.getPiece((currentPosition));
+
+        if (pieceAtPosition == null || pieceAtPosition.getTeamColor() != teamColor) {
+            movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
+        }
+        return movesByDirection;
+}
+
+    private boolean isOnBoard(int row, int col) {
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
 }

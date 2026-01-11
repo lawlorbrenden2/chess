@@ -23,17 +23,13 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             int rowDirection,
             int colDirection) {
 
+        Collection<ChessMove> movesByDirection = new ArrayList<>();
         ChessPiece movingPiece = board.getPiece(startingPosition);
         ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
-        Collection<ChessMove> movesByDirection = new ArrayList<>();
-        int startRow = startingPosition.getRow();
-        int startCol = startingPosition.getColumn();
-        int currentRow = startRow;
-        int currentCol = startCol;
 
         while (true) {
-            currentRow += rowDirection;
-            currentCol += colDirection;
+            int currentRow = startingPosition.getRow() + rowDirection;
+            int currentCol = startingPosition.getColumn() + colDirection;
 
             if (!isOnBoard(currentRow, currentCol)) {
                 break;
@@ -44,10 +40,10 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
 
             if (pieceAtPosition == null) {
                 movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
-            } else if (pieceAtPosition.getTeamColor() == teamColor) {
+            } else if (pieceAtPosition.getTeamColor() != teamColor) {
+                movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
                 break;
             } else {
-                movesByDirection.add(new ChessMove(startingPosition, currentPosition, null));
                 break;
             }
         }
