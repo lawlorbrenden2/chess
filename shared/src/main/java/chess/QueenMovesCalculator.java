@@ -2,9 +2,16 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class QueenMovesCalculator implements PieceMovesCalculator {
+
+    /**
+     * Calculates all possible moves for a queen from its current position.
+     *
+     * @param board the chess board containing all the pieces
+     * @param startPosition the current position of the queen
+     * @return a collection of ChessMove objects representing all legal moves for this queen
+     */
     @Override
     public Collection<ChessMove> calcMoves(ChessBoard board, ChessPosition startPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
@@ -21,6 +28,15 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
         return moves;
     }
 
+    /**
+     * Calculates all possible moves in a single direction for a queen.
+     *
+     * @param board the chess board containing all pieces
+     * @param startingPosition the current position of the queen
+     * @param rowDirection +1 for down, -1 for up
+     * @param colDirection +1 for right, -1 for left
+     * @return a collection of ChessMove objects representing legal moves in this direction
+     */
     private Collection<ChessMove> calcMovesHelper(
             ChessBoard board,
             ChessPosition startingPosition,
@@ -30,10 +46,9 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
         Collection<ChessMove> movesByDirection = new ArrayList<>();
         ChessPiece movingPiece = board.getPiece(startingPosition);
         ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
-        int startRow = startingPosition.getRow();
-        int startCol = startingPosition.getColumn();
-        int currentRow = startRow;
-        int currentCol = startCol;
+
+        int currentRow = startingPosition.getRow();
+        int currentCol = startingPosition.getColumn();
 
         while (true) {
             currentRow += rowDirection;
@@ -58,6 +73,13 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
         return movesByDirection;
     }
 
+    /**
+     * Determines if a specific square is within the bounds of a chess board
+     *
+     * @param row the row of the board
+     * @param col the column of the board
+     * @return bool value of if the square is within the bounds of a chess board
+     */
     private boolean isOnBoard(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }

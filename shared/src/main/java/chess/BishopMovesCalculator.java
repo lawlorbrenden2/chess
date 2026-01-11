@@ -5,6 +5,13 @@ import java.util.Collection;
 
 public class BishopMovesCalculator implements PieceMovesCalculator {
 
+    /**
+     * Calculates all possible moves for a bishop from its current position.
+     *
+     * @param board the chess board containing all the pieces
+     * @param startPosition the current position of the bishop
+     * @return a collection of ChessMove objects representing all legal moves for this bishop
+     */
     @Override
     public Collection<ChessMove> calcMoves(ChessBoard board, ChessPosition startPosition) {
         Collection<ChessMove> moves = new ArrayList<>();
@@ -17,6 +24,15 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         return moves;
     }
 
+    /**
+     * Calculates all possible moves in a single diagonal direction for a bishop.
+     *
+     * @param board the chess board containing all pieces
+     * @param startingPosition the current position of the bishop
+     * @param rowDirection +1 for down, -1 for up
+     * @param colDirection +1 for right, -1 for left
+     * @return a collection of ChessMove objects representing legal moves in this direction
+     */
     private Collection<ChessMove> calcMovesHelper(
             ChessBoard board,
             ChessPosition startingPosition,
@@ -27,9 +43,12 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         ChessPiece movingPiece = board.getPiece(startingPosition);
         ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
 
+        int currentRow = startingPosition.getRow();
+        int currentCol = startingPosition.getColumn();
+
         while (true) {
-            int currentRow = startingPosition.getRow() + rowDirection;
-            int currentCol = startingPosition.getColumn() + colDirection;
+            currentRow += rowDirection;
+            currentCol += colDirection;
 
             if (!isOnBoard(currentRow, currentCol)) {
                 break;
@@ -50,6 +69,13 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         return movesByDirection;
     }
 
+    /**
+     * Determines if a specific square is within the bounds of a chess board
+     *
+     * @param row the row of the board
+     * @param col the column of the board
+     * @return bool value of if the square is within the bounds of a chess board
+     */
     private boolean isOnBoard(int row, int col) {
         return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
