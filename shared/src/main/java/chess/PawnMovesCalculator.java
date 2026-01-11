@@ -72,7 +72,6 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
             int forward,
             Collection<ChessMove> moves) {
 
-
         // only allow double move from starting row
         int startRow = startPosition.getRow();
         if ((startRow != 2 && forward == 1) ||
@@ -91,7 +90,6 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
             moves.add(new ChessMove(startPosition, targetPos, null));
         }
     }
-
 
     /**
      *
@@ -112,7 +110,9 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
 
         for (int direction : new int[]{-1, 1}) {
             int targetCol = startPosition.getColumn() + direction;
-            if (!isOnBoard(targetRow, targetCol)) continue;
+            if (!isOnBoard(targetRow, targetCol)) {
+                continue;
+            }
 
             ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
             ChessPiece pieceAtTarget = board.getPiece(targetPosition);
@@ -162,7 +162,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
      *
      * @param row the row of the board
      * @param forward the direction the pawn is moving
-     * @return
+     * @return bool value of if the row is a valid promotion row
      */
     private boolean isPromotionRow(int row, int forward) {
             return (forward == 1 && row == 8) || (forward == -1 && row == 1);
