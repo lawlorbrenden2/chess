@@ -28,23 +28,23 @@ public class RookMovesCalculator implements PieceMovesCalculator {
      * Calculates all possible moves in a single direction for a rook.
      *
      * @param board the chess board containing all pieces
-     * @param startingPosition the current position of the rook
+     * @param startPosition the current position of the rook
      * @param rowDirection +1 for down, -1 for up
      * @param colDirection +1 for right, -1 for left
      * @return a collection of ChessMove objects representing legal moves in this direction
      */
     private Collection<ChessMove> calcMovesHelper(
             ChessBoard board,
-            ChessPosition startingPosition,
+            ChessPosition startPosition,
             int rowDirection,
             int colDirection) {
 
         Collection<ChessMove> movesByDirection = new ArrayList<>();
-        ChessPiece movingPiece = board.getPiece(startingPosition);
+        ChessPiece movingPiece = board.getPiece(startPosition);
         ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
 
-        int targetRow = startingPosition.getRow();
-        int targetCol = startingPosition.getColumn();
+        int targetRow = startPosition.getRow();
+        int targetCol = startPosition.getColumn();
 
         while (true) {
             targetRow += rowDirection;
@@ -55,14 +55,14 @@ public class RookMovesCalculator implements PieceMovesCalculator {
             }
 
             ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
-            ChessPiece pieceAtPosition = board.getPiece((targetPosition));
+            ChessPiece pieceAtTarget = board.getPiece(targetPosition);
 
-            if (pieceAtPosition == null) {
-                movesByDirection.add(new ChessMove(startingPosition, targetPosition, null));
-            } else if (pieceAtPosition.getTeamColor() == teamColor) {
+            if (pieceAtTarget == null) {
+                movesByDirection.add(new ChessMove(startPosition, targetPosition, null));
+            } else if (pieceAtTarget.getTeamColor() == teamColor) {
                 break;
             } else {
-                movesByDirection.add(new ChessMove(startingPosition, targetPosition, null));
+                movesByDirection.add(new ChessMove(startPosition, targetPosition, null));
                 break;
             }
         }

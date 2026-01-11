@@ -32,32 +32,32 @@ public class KingMovesCalculator implements PieceMovesCalculator {
      * Calculates all possible moves in a single direction for a king.
      *
      * @param board the chess board containing all pieces
-     * @param startingPosition the current position of the king
+     * @param startPosition the current position of the king
      * @param rowDirection +1 for down, -1 for up
      * @param colDirection +1 for right, -1 for left
      * @return a collection of ChessMove objects representing legal moves in this direction
      */
     private Collection<ChessMove> calcMovesHelper(
             ChessBoard board,
-            ChessPosition startingPosition,
+            ChessPosition startPosition,
             int rowDirection,
             int colDirection) {
 
         Collection<ChessMove> movesByDirection = new ArrayList<>();
-        ChessPiece movingPiece = board.getPiece(startingPosition);
+        ChessPiece movingPiece = board.getPiece(startPosition);
         ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
-        int targetRow = startingPosition.getRow() + rowDirection;
-        int targetCol = startingPosition.getColumn() + colDirection;
+        int targetRow = startPosition.getRow() + rowDirection;
+        int targetCol = startPosition.getColumn() + colDirection;
 
         if (!isOnBoard(targetRow, targetCol)) {
             return movesByDirection;
         }
 
         ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
-        ChessPiece pieceAtPosition = board.getPiece((targetPosition));
+        ChessPiece pieceAtTarget = board.getPiece(targetPosition);
 
-        if (pieceAtPosition == null || pieceAtPosition.getTeamColor() != teamColor) {
-            movesByDirection.add(new ChessMove(startingPosition, targetPosition, null));
+        if (pieceAtTarget == null || pieceAtTarget.getTeamColor() != teamColor) {
+            movesByDirection.add(new ChessMove(startPosition, targetPosition, null));
         }
         return movesByDirection;
 }

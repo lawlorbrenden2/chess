@@ -3,6 +3,8 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static chess.ChessGame.TeamColor.WHITE;
+
 public class PawnMovesCalculator implements PieceMovesCalculator {
 
     /**
@@ -14,61 +16,117 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
      */
     @Override
     public Collection<ChessMove> calcMoves(ChessBoard board, ChessPosition startPosition) {
+        Collection<ChessMove> moves = new ArrayList<>();
+        ChessPiece pawn = board.getPiece(startPosition);
+        ChessGame.TeamColor teamColor = pawn.getTeamColor();
 
-        return new ArrayList<>(calcMovesHelper(board, startPosition, 1, 0));
+        int forward = (teamColor == WHITE) ? 1 : -1;
+
+        addForwardMove(board, startPosition, forward, moves);
+        addDoubleMove(board, startPosition, forward, moves);
+        addDiagonalCaptures(board, startPosition, forward, moves, teamColor);
+
+        return moves;
     }
 
-    /**
-     * Calculates all possible moves in a single direction for a pawn.
-     *
-     * @param board the chess board containing all pieces
-     * @param startingPosition the current position of the pawn
-     * @param rowDirection +1 for down, -1 for up
-     * @param colDirection +1 for right, -1 for left
-     * @return a collection of ChessMove objects representing legal moves in this direction
-     */
-    private Collection<ChessMove> calcMovesHelper(
+
+    private void addForwardMove(
             ChessBoard board,
-            ChessPosition startingPosition,
-            int rowDirection,
-            int colDirection) {
+            ChessPosition startPosition,
+            int forward,
+            Collection<ChessMove> moves) {
 
-        Collection<ChessMove> movesByDirection = new ArrayList<>();
-        ChessPiece movingPiece = board.getPiece(startingPosition);
-        ChessGame.TeamColor teamColor = movingPiece.getTeamColor();
+        int targetRow = startPosition.getRow() + forward;
+        int targetCol = startPosition.getColumn();
 
-        int targetRow = startingPosition.getRow();
-        int targetCol = startingPosition.getColumn();
+        ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
+        ChessPiece pieceAtTarget = board.getPiece((targetPosition));
 
-        while (true) {
-            targetRow += rowDirection;
-            targetCol += colDirection;
-
-            if (!isOnBoard(targetRow, targetCol)) {
-                break;
-            }
-
-            ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
-            ChessPiece pieceAtPosition = board.getPiece((targetPosition));
-
-            if (pieceAtPosition == null) {
-                movesByDirection.add(new ChessMove(startingPosition, targetPosition, null));
-            } else if (pieceAtPosition.getTeamColor() == teamColor) {
-                break;
+        if (pieceAtTarget == null) {
+            if (isPromotionRow(targetRow, forward)) {
+                addPromotionMoves(startPosition, targetPosition, moves);
+            } else {
+                moves.add(new ChessMove(startPosition, targetPosition, null));
             }
         }
-        return movesByDirection;
     }
 
-    /**
-     * Determines if a specific square is within the bounds of a chess board
-     *
-     * @param row the row of the board
-     * @param col the column of the board
-     * @return bool value of if the square is within the bounds of a chess board
-     */
-    private boolean isOnBoard(int row, int col) {
-        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+    private void addDoubleMove(
+            ChessBoard board,
+            ChessPosition startPosition,
+            int forward,
+            Collection<ChessMove> moves) {
+
+
+        // only allow double move from starting row
+        int startRow = startPosition.getRow();
+        if ((startRow != 2 && forward == 1) ||
+            (startRow != 7 && forward == -1)) {
+            return;
+        }
+
+        int middleRow = startRow + forward;
+        int targetRow = startRow + 2 * forward;
+        int targetCol = startPosition.getColumn();
+
+        ChessPosition middlePos = new ChessPosition(middleRow, targetCol);
+        ChessPosition targetPos = new ChessPosition(targetRow, targetCol);
+
+        if (board.getPiece(middlePos) == null && board.getPiece(targetPos) == null) {
+            moves.add(new ChessMove(startPosition, targetPos, null));
+        }
     }
 
-}
+
+    private void addDiagonalCaptures(ChessBoard board,
+            ChessPosition startPosition,
+            int forward,
+            Collection<ChessMove> moves,
+            ChessGame.TeamColor teamColor) {
+
+        int targetRow = startPosition.getRow() + forward;
+
+        for (int direction : new int[]{-1, 1}) {
+            int targetCol = startPosition.getColumn() + direction;
+            if (!isOnBoard(targetRow, targetCol)) continue;
+
+            ChessPosition targetPosition = new ChessPosition(targetRow, targetCol);
+            ChessPiece pieceAtTarget = board.getPiece(targetPosition);
+
+            if (pieceAtTarget != null && pieceAtTarget.getTeamColor() != teamColor) {
+                if (isPromotionRow(targetRow, forward)) {
+                    addPromotionMoves(startPosition, targetPosition, moves);
+                } else {
+                    moves.add(new ChessMove(startPosition, targetPosition, null));
+                }
+            }
+        }
+    }
+
+        private void addPromotionMoves(
+                ChessPosition startPosition,
+                ChessPosition targetPosition,
+                Collection<ChessMove> moves) {
+
+            moves.add(new ChessMove(startPosition, targetPosition, ChessPiece.PieceType.QUEEN));
+            moves.add(new ChessMove(startPosition, targetPosition, ChessPiece.PieceType.ROOK));
+            moves.add(new ChessMove(startPosition, targetPosition, ChessPiece.PieceType.BISHOP));
+            moves.add(new ChessMove(startPosition, targetPosition, ChessPiece.PieceType.KNIGHT));
+        }
+
+        /**
+         * Determines if a specific square is within the bounds of a chess board
+         *
+         * @param row the row of the board
+         * @param col the column of the board
+         * @return bool value of if the square is within the bounds of a chess board
+         */
+        private boolean isOnBoard(int row, int col){
+            return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+        }
+
+        private boolean isPromotionRow(int row, int forward) {
+            return (forward == 1 && row == 8) || (forward == -1 && row == 1);
+        }
+
+    }
