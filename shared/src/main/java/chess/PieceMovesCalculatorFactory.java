@@ -1,7 +1,5 @@
 package chess;
 
-import static chess.ChessPiece.PieceType.KING;
-
 public class PieceMovesCalculatorFactory {
     public static PieceMovesCalculator getType(ChessPiece.PieceType type) {
         return switch (type) {
