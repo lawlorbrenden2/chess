@@ -1,9 +1,11 @@
-package chess;
+package chess.piecemoves;
+
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class BishopMovesCalculator implements PieceMovesCalculator {
+class BishopMovesCalculator implements PieceMovesCalculator {
 
     /**
      * Calculates all possible moves for a bishop from its current position.

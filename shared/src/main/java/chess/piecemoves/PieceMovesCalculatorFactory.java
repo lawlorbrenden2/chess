@@ -1,4 +1,6 @@
-package chess;
+package chess.piecemoves;
+
+import chess.ChessPiece;
 
 public class PieceMovesCalculatorFactory {
     public static PieceMovesCalculator getType(ChessPiece.PieceType type) {

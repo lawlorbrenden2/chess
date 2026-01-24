@@ -1,9 +1,11 @@
-package chess;
+package chess.piecemoves;
+
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KnightMovesCalculator implements PieceMovesCalculator {
+class KnightMovesCalculator implements PieceMovesCalculator {
 
     /**
      * Calculates all possible moves for a knight from its current position.

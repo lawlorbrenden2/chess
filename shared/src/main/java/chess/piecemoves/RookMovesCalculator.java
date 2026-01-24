@@ -1,9 +1,13 @@
-package chess;
+package chess.piecemoves;
+
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPosition;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class RookMovesCalculator implements PieceMovesCalculator {
+class RookMovesCalculator implements PieceMovesCalculator {
 
     /**
      * Calculates all possible moves for a rook from its current position.

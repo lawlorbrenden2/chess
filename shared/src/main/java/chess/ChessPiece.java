@@ -1,5 +1,8 @@
 package chess;
 
+import chess.piecemoves.PieceMovesCalculator;
+import chess.piecemoves.PieceMovesCalculatorFactory;
+
 import java.util.Collection;
 import java.util.Objects;
 

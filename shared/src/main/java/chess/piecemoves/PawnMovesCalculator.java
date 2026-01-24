@@ -1,11 +1,13 @@
-package chess;
+package chess.piecemoves;
+
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import static chess.ChessGame.TeamColor.WHITE;
 
-public class PawnMovesCalculator implements PieceMovesCalculator {
+class PawnMovesCalculator implements PieceMovesCalculator {
 
     /**
      * Calculates all possible moves for a pawn from its current position.

@@ -1,9 +1,11 @@
-package chess;
+package chess.piecemoves;
+
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class SlidingMovesCalculator {
+class SlidingMovesCalculator {
 
     /**
      * Calculates all the possible sliding moves for either a bishop, queen, or rook
@@ -14,7 +16,7 @@ public class SlidingMovesCalculator {
      * @param colDirection Column moving direction
      * @return Array of possible moves
      */
-    public static Collection<ChessMove> slidingMovesHelper(
+    static Collection<ChessMove> slidingMovesHelper(
             ChessBoard board,
             ChessPosition startPosition,
             int rowDirection,
