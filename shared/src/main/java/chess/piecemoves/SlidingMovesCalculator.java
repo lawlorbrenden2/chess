@@ -52,14 +52,14 @@ class SlidingMovesCalculator {
         return movesByDirection;
     }
 
-        /**
-         * Determines if a specific square is within the bounds of a chess board
-         *
-         * @param row the row of the board
-         * @param col the column of the board
-         * @return bool value of if the square is within the bounds of a chess board
-         */
-        private static boolean isOnBoard(int row, int col) {
-            return row >= 1 && row <= 8 && col >= 1 && col <= 8;
-        }
+    /**
+     * Determines if a specific square is within the bounds of a chess board
+     *
+     * @param row the row of the board
+     * @param col the column of the board
+     * @return bool value of if the square is within the bounds of a chess board
+     */
+    private static boolean isOnBoard(int row, int col) {
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
     }
+}
