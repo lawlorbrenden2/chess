@@ -61,7 +61,8 @@ public class ChessGame {
         Collection<ChessMove> validMoves = new ArrayList<>();
 
         for (ChessMove move : possibleMoves) {
-
+            ChessBoard boardCopy = new ChessBoard(board);
+            makeMoveHelper(boardCopy, move, piece);
         }
 
         return validMoves;
@@ -74,7 +75,45 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+        ChessPiece piece = board.getPiece(start);
+
+        if (piece == null) {
+            throw new InvalidMoveException("No piece at square");
+        }
+        if (piece.getTeamColor() != teamTurn) {
+            throw new InvalidMoveException("Not your turn");
+        }
+        Collection<ChessMove> validMoves = validMoves(start);
+        if (!validMoves.contains(move)) {
+            throw new InvalidMoveException("Illegal move");
+        }
+        makeMoveHelper(board, move, piece);
+        switchTurns();
+
+    }
+
+
+    private void makeMoveHelper(ChessBoard board, ChessMove move, ChessPiece piece) {
+        // remove piece from start square
+        board.addPiece(move.getStartPosition(), null);
+
+        // update piece type if promoting
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN && move.getPromotionPiece() != null) {
+            piece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
+        }
+
+        // replace piece at target square with new piece
+        board.addPiece(move.getEndPosition(), piece);
+    }
+
+    private void switchTurns() {
+        if (getTeamTurn() == TeamColor.WHITE) {
+            setTeamTurn(TeamColor.BLACK);
+        } else {
+            setTeamTurn(TeamColor.WHITE);
+        }
     }
 
     /**
