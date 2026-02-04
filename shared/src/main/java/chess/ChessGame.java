@@ -63,6 +63,9 @@ public class ChessGame {
         for (ChessMove move : possibleMoves) {
             ChessBoard boardCopy = new ChessBoard(board);
             makeMoveHelper(boardCopy, move, piece);
+            if (!isInCheckHelper(getTeamTurn(), boardCopy)) {
+                validMoves.add(move);
+            }
         }
 
         return validMoves;
@@ -77,7 +80,7 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
-        ChessPiece piece = board.getPiece(start);
+        ChessPiece piece = this.board.getPiece(start);
 
         if (piece == null) {
             throw new InvalidMoveException("No piece at square");
@@ -89,7 +92,7 @@ public class ChessGame {
         if (!validMoves.contains(move)) {
             throw new InvalidMoveException("Illegal move");
         }
-        makeMoveHelper(board, move, piece);
+        makeMoveHelper(this.board, move, piece);
         switchTurns();
 
     }
@@ -123,8 +126,56 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return isInCheckHelper(teamColor, this.board);
     }
+
+    /**
+     * Determines if the given team is in check for a given chess board
+     *
+     * @param teamColor which team to check for check
+     * @param board the board to check
+     * @return True if the specified team is in check
+     */
+    private boolean isInCheckHelper(TeamColor teamColor, ChessBoard board) {
+        // locate the king
+        ChessPosition kingPos = null;
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition square = new ChessPosition(r, c);
+                ChessPiece piece = board.getPiece(square);
+                if (
+                        piece != null &&
+                        piece.getPieceType() == ChessPiece.PieceType.KING &&
+                        piece.getTeamColor() == teamColor
+                ) {
+                    kingPos = square;
+                    break;
+                }
+            }
+            if (kingPos != null) {
+                break;
+            }
+        }
+
+        // loop through all enemy pieces and see if any of them can capture our king
+        TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition square = new ChessPosition(r, c);
+                ChessPiece piece = board.getPiece(square);
+                if (piece != null && piece.getTeamColor() == enemyColor) {
+                    Collection<ChessMove> moves = piece.pieceMoves(board, square);
+                    for (ChessMove move : moves) {
+                        if (move.getEndPosition() == kingPos) {
+                            return true; // King is in check
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Determines if the given team is in checkmate
