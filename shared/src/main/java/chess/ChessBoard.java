@@ -10,8 +10,16 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessBoard {
-    ChessPiece[][] squares = new ChessPiece[8][8];
+    private final ChessPiece[][] squares;
     public ChessBoard() {
+        squares = new ChessPiece[8][8];
+    }
+
+    public ChessBoard(ChessBoard copy) {
+        this.squares = new ChessPiece[8][8];
+        for (int r = 0; r < 8; r++) {
+            this.squares[r] = Arrays.copyOf(copy.squares[r], 8);
+        }
     }
 
     /**

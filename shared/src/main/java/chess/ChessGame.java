@@ -53,7 +53,16 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
-        Collection<ChessMove> validMoves = new ArrayList<>(piece.pieceMoves(board, startPosition));
+        if (piece == null) {
+            return null;
+        }
+
+        Collection<ChessMove> possibleMoves = new ArrayList<>(piece.pieceMoves(board, startPosition));
+        Collection<ChessMove> validMoves = new ArrayList<>();
+
+        for (ChessMove move : possibleMoves) {
+
+        }
 
         return validMoves;
     }
