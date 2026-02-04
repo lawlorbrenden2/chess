@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -63,7 +64,7 @@ public class ChessGame {
         for (ChessMove move : possibleMoves) {
             ChessBoard boardCopy = new ChessBoard(board);
             makeMoveHelper(boardCopy, move, piece);
-            if (!isInCheckHelper(getTeamTurn(), boardCopy)) {
+            if (!isInCheckHelper(piece.getTeamColor(), boardCopy)) {
                 validMoves.add(move);
             }
         }
@@ -98,6 +99,14 @@ public class ChessGame {
     }
 
 
+    /**
+     * Makes a move in a chess game on a given board
+     *
+     * @param board the board we're making the move on
+     * @param move chess move to perform
+     * @param piece the piece we move to the next square
+     * @throws InvalidMoveException if move is invalid
+     */
     private void makeMoveHelper(ChessBoard board, ChessMove move, ChessPiece piece) {
         // remove piece from start square
         board.addPiece(move.getStartPosition(), null);
@@ -111,6 +120,10 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), piece);
     }
 
+    /**
+     * Switches the turns of the game
+     *
+     */
     private void switchTurns() {
         if (getTeamTurn() == TeamColor.WHITE) {
             setTeamTurn(TeamColor.BLACK);
@@ -166,7 +179,7 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() == enemyColor) {
                     Collection<ChessMove> moves = piece.pieceMoves(board, square);
                     for (ChessMove move : moves) {
-                        if (move.getEndPosition() == kingPos) {
+                        if (move.getEndPosition().equals(kingPos)) {
                             return true; // King is in check
                         }
                     }
@@ -184,7 +197,22 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
+
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition square = new ChessPosition(r, c);
+                ChessPiece piece = board.getPiece(square);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    if (!validMoves(square).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -195,8 +223,25 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                ChessPosition square = new ChessPosition(r, c);
+                ChessPiece piece = board.getPiece(square);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    if (!validMoves(square).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
+
 
     /**
      * Sets this game's chessboard with a given board
@@ -216,13 +261,18 @@ public class ChessGame {
         return board;
     }
 
+
     @Override
-    public int hashCode() {
-        return super.hashCode();
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessGame chessGame = (ChessGame) o;
+        return Objects.equals(board, chessGame.board) && teamTurn == chessGame.teamTurn;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public int hashCode() {
+        return Objects.hash(board, teamTurn);
     }
 }
