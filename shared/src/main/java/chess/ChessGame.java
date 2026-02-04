@@ -105,7 +105,6 @@ public class ChessGame {
      * @param board the board we're making the move on
      * @param move chess move to perform
      * @param piece the piece we move to the next square
-     * @throws InvalidMoveException if move is invalid
      */
     private void makeMoveHelper(ChessBoard board, ChessMove move, ChessPiece piece) {
         // remove piece from start square
@@ -201,18 +200,7 @@ public class ChessGame {
             return false;
         }
 
-        for (int r = 1; r <= 8; r++) {
-            for (int c = 1; c <= 8; c++) {
-                ChessPosition square = new ChessPosition(r, c);
-                ChessPiece piece = board.getPiece(square);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    if (!validMoves(square).isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return availableMoves(teamColor);
     }
 
     /**
@@ -228,6 +216,17 @@ public class ChessGame {
             return false;
         }
 
+        return availableMoves(teamColor);
+
+    }
+
+    /**
+     * Determines if a specified side has any legal moves available to them
+     *
+     * @param teamColor which team to check for
+     * @return True if the specified team has at least one available move, otherwise false
+     */
+    private boolean availableMoves(TeamColor teamColor) {
         for (int r = 1; r <= 8; r++) {
             for (int c = 1; c <= 8; c++) {
                 ChessPosition square = new ChessPosition(r, c);
@@ -240,6 +239,7 @@ public class ChessGame {
             }
         }
         return true;
+
     }
 
 
