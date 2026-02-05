@@ -175,13 +175,20 @@ public class ChessGame {
             for (int c = 1; c <= 8; c++) {
                 ChessPosition square = new ChessPosition(r, c);
                 ChessPiece piece = board.getPiece(square);
-                if (piece != null && piece.getTeamColor() == enemyColor) {
-                    Collection<ChessMove> moves = piece.pieceMoves(board, square);
-                    for (ChessMove move : moves) {
-                        if (move.getEndPosition().equals(kingPos)) {
-                            return true; // King is in check
-                        }
-                    }
+                if (getMoves(board, piece, enemyColor, square, kingPos)) {
+                    return true; // King is in check
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean getMoves(ChessBoard board, ChessPiece piece, TeamColor enemyColor, ChessPosition square, ChessPosition kingPos) {
+        if (piece != null && piece.getTeamColor() == enemyColor) {
+            Collection<ChessMove> moves = piece.pieceMoves(board, square);
+            for (ChessMove move : moves) {
+                if (move.getEndPosition().equals(kingPos)) {
+                    return true;
                 }
             }
         }
