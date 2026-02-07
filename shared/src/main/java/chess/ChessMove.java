@@ -13,12 +13,19 @@ public class ChessMove {
     private final ChessPosition startPosition;
     private final ChessPosition endPosition;
     private final ChessPiece.PieceType promotionPiece;
+    private final boolean isCastling;
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
+        this(startPosition, endPosition, promotionPiece, false);
+    }
+
+    public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
+                     ChessPiece.PieceType promotionPiece, boolean isCastling) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
+        this.isCastling = isCastling;
     }
 
     /**
@@ -44,6 +51,13 @@ public class ChessMove {
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
     }
+
+    /**
+     * Gets if the move is a castling move
+     *
+     * @return true if castling false otherwise
+     */
+    public boolean isCastling() { return isCastling; }
 
     @Override
     public String toString() {
