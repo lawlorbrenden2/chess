@@ -61,8 +61,18 @@ class KingMovesCalculator implements PieceMovesCalculator {
         if (pieceAtTarget == null || pieceAtTarget.getTeamColor() != teamColor) {
             movesByDirection.add(new ChessMove(startPosition, targetPosition, null));
         }
+
+        movesByDirection.addAll(castlingHelper(board, startPosition));
+
         return movesByDirection;
 }
+
+    private Collection<ChessMove> castlingHelper(ChessBoard board, ChessPosition startPosition) {
+        Collection<ChessMove> castlingMoves = new ArrayList<>();
+
+
+        return castlingMoves;
+    }
 
     /**
      * Determines if a specific square is within the bounds of a chess board

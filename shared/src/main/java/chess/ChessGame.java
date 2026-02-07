@@ -14,11 +14,24 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor teamTurn;
+    private boolean whiteKingMoved;
+    private boolean blackKingMoved;
+    private boolean whiteKingsideRookMoved;
+    private boolean blackKingsideRookMoved;
+    private boolean whiteQueensideRookMoved;
+    private boolean blackQueensideRookMoved;
+
 
     public ChessGame() {
         board = new ChessBoard();
         board.resetBoard();
         teamTurn = TeamColor.WHITE;
+        whiteKingMoved = false;
+        blackKingMoved = false;
+        whiteKingsideRookMoved = false;
+        blackKingsideRookMoved = false;
+        whiteQueensideRookMoved = false;
+        blackQueensideRookMoved = false;
     }
 
     /**
