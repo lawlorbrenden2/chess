@@ -154,6 +154,16 @@ public class ChessGame {
         // replace piece at target square with new piece
         board.addPiece(endPos, piece);
 
+        // check for en passant
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+            Math.abs(startPos.getRow()) - endPos.getRow() == 2) { // pawn moves two squares
+            int targetRow = (startPos.getRow() + startPos.getColumn()) / 2;
+            enPassantTarget = new ChessPosition(targetRow, startPos.getColumn());
+        } else {
+            enPassantTarget = null;
+        }
+
+
         // move rook if castling
         if (piece.getPieceType() == ChessPiece.PieceType.KING &&
             Math.abs(move.getStartPosition().getColumn() -
