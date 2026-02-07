@@ -198,7 +198,7 @@ public class ChessGame {
     private boolean isSquareAttacked(ChessPosition square, TeamColor attackingTeam) {
         for (int r = 1; r <= 8; r++) {
             for (int c = 1; c <= 8; c++) {
-                if (isAttackedByPiece(square, attackingTeam, r, c)) {
+                if (isAttackedByPiece(square, attackingTeam, r, c, board)) {
                     return true;
                 }
             }
@@ -206,7 +206,7 @@ public class ChessGame {
         return false;
     }
 
-    private boolean isAttackedByPiece(ChessPosition square, TeamColor attackingTeam, int r, int c) {
+    private static boolean isAttackedByPiece(ChessPosition square, TeamColor attackingTeam, int r, int c, ChessBoard board) {
         ChessPosition attackerPos = new ChessPosition(r, c);
         ChessPiece piece = board.getPiece(attackerPos);
         if (piece != null && piece.getTeamColor() == attackingTeam) {
