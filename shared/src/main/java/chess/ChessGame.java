@@ -183,21 +183,42 @@ public class ChessGame {
             if (board.getPiece(new ChessPosition(1, 6)) != null ||
                 board.getPiece(new ChessPosition(1, 7)) != null) return false;
             if (isSquareAttacked(new ChessPosition(1, 6), TeamColor.BLACK) ||
-                isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK) return false;
+                isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK)) return false;
 
 
             return true;
         }
-
+        return true;
     }
 
     private boolean canCastleQueenside(TeamColor teamColor) {
-
+        return true;
     }
 
-    private boolean isSquareAttacked(ChessPosition square, TeamColor teamColor) {
-
+    private boolean isSquareAttacked(ChessPosition square, TeamColor attackingTeam) {
+        for (int r = 1; r <= 8; r++) {
+            for (int c = 1; c <= 8; c++) {
+                if (isAttackedByPiece(square, attackingTeam, r, c)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
+
+    private boolean isAttackedByPiece(ChessPosition square, TeamColor attackingTeam, int r, int c) {
+        ChessPosition attackerPos = new ChessPosition(r, c);
+        ChessPiece piece = board.getPiece(attackerPos);
+        if (piece != null && piece.getTeamColor() == attackingTeam) {
+            for (ChessMove move : piece.pieceMoves(board, attackerPos)) {
+                if (move.getEndPosition().equals(square)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Switches the turns of the game
@@ -248,31 +269,8 @@ public class ChessGame {
                 break;
             }
         }
-
-        // loop through all enemy pieces and see if any of them can capture our king
         TeamColor enemyColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
-        for (int r = 1; r <= 8; r++) {
-            for (int c = 1; c <= 8; c++) {
-                ChessPosition square = new ChessPosition(r, c);
-                ChessPiece piece = board.getPiece(square);
-                if (getMoves(board, piece, enemyColor, square, kingPos)) {
-                    return true; // King is in check
-                }
-            }
-        }
-        return false;
-    }
-
-    private static boolean getMoves(ChessBoard board, ChessPiece piece, TeamColor enemyColor, ChessPosition square, ChessPosition kingPos) {
-        if (piece != null && piece.getTeamColor() == enemyColor) {
-            Collection<ChessMove> moves = piece.pieceMoves(board, square);
-            for (ChessMove move : moves) {
-                if (move.getEndPosition().equals(kingPos)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return isSquareAttacked(kingPos, enemyColor);
     }
 
 
