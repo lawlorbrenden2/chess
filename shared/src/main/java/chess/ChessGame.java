@@ -232,20 +232,36 @@ public class ChessGame {
         }
 
         if (teamColor == TeamColor.WHITE) {
-            if (whiteKingMoved || whiteKingsideRookMoved) return false;
-            if (isInCheckHelper(teamColor, board)) return false;
+            if (whiteKingMoved || whiteKingsideRookMoved) {
+                return false;
+            }
+            if (isInCheckHelper(teamColor, board)) {
+                return false;
+            }
             if (board.getPiece(new ChessPosition(1, 6)) != null ||
-                board.getPiece(new ChessPosition(1, 7)) != null) return false;
+                board.getPiece(new ChessPosition(1, 7)) != null) {
+                return false;
+            }
             if (isSquareAttacked(new ChessPosition(1, 6), TeamColor.BLACK, board) ||
-                isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK, board)) return false;
+                isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK, board)){
+                return false;
+            }
             return true;
         } else {
-            if (blackKingMoved || blackKingsideRookMoved) return false;
-            if (isInCheckHelper(teamColor, board)) return false;
+            if (blackKingMoved || blackKingsideRookMoved) {
+                return false;
+            }
+            if (isInCheckHelper(teamColor, board)) {
+                return false;
+            }
             if (board.getPiece(new ChessPosition(8, 6)) != null ||
-                board.getPiece(new ChessPosition(8, 7)) != null) return false;
+                board.getPiece(new ChessPosition(8, 7)) != null) {
+                return false;
+            }
             if (isSquareAttacked(new ChessPosition(8, 6), TeamColor.WHITE, board) ||
-                isSquareAttacked(new ChessPosition(8, 7), TeamColor.WHITE, board)) return false;
+                isSquareAttacked(new ChessPosition(8, 7), TeamColor.WHITE, board)) {
+                return false;
+            }
             return true;
         }
     }
@@ -267,22 +283,38 @@ public class ChessGame {
         }
 
         if (teamColor == TeamColor.WHITE) {
-            if (whiteKingMoved || whiteQueensideRookMoved) return false;
-            if (isInCheckHelper(teamColor, board)) return false;
+            if (whiteKingMoved || whiteQueensideRookMoved) {
+                return false;
+            }
+            if (isInCheckHelper(teamColor, board)) {
+                return false;
+            }
             if (board.getPiece(new ChessPosition(1, 2)) != null ||
                 board.getPiece(new ChessPosition(1, 3)) != null ||
-                board.getPiece(new ChessPosition(1, 4)) != null) return false;
+                board.getPiece(new ChessPosition(1, 4)) != null) {
+                return false;
+            }
             if (isSquareAttacked(new ChessPosition(1, 3), TeamColor.BLACK, board) ||
-                isSquareAttacked(new ChessPosition(1, 4), TeamColor.BLACK, board)) return false;
+                isSquareAttacked(new ChessPosition(1, 4), TeamColor.BLACK, board)) {
+                return false;
+            }
             return true;
         } else {
-            if (blackKingMoved || blackQueensideRookMoved) return false;
-            if (isInCheckHelper(teamColor, board)) return false;
+            if (blackKingMoved || blackQueensideRookMoved) {
+                return false;
+            }
+            if (isInCheckHelper(teamColor, board)) {
+                return false;
+            }
             if (board.getPiece(new ChessPosition(8, 2)) != null ||
                 board.getPiece(new ChessPosition(8, 3)) != null ||
-                board.getPiece(new ChessPosition(8, 4)) != null) return false;
+                board.getPiece(new ChessPosition(8, 4)) != null) {
+                return false;
+            }
             if (isSquareAttacked(new ChessPosition(8, 3), TeamColor.WHITE, board) ||
-                isSquareAttacked(new ChessPosition(8, 4), TeamColor.WHITE, board)) return false;
+                isSquareAttacked(new ChessPosition(8, 4), TeamColor.WHITE, board)) {
+                return false;
+            }
             return true;
         }
     }
@@ -316,7 +348,13 @@ public class ChessGame {
      * @param board the board to test
      * @return true if under attack false otherwise
      */
-    private static boolean isAttackedByPiece(ChessPosition square, TeamColor attackingTeam, ChessPiece piece, ChessPosition attackerPos, ChessBoard board) {
+    private static boolean isAttackedByPiece(
+            ChessPosition square,
+            TeamColor attackingTeam,
+            ChessPiece piece,
+            ChessPosition attackerPos,
+            ChessBoard board) {
+
         if (piece != null && piece.getTeamColor() == attackingTeam) {
             for (ChessMove move : piece.pieceMoves(board, attackerPos)) {
                 if (move.getEndPosition().equals(square)) {
