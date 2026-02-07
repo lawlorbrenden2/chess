@@ -72,17 +72,21 @@ public class ChessGame {
         }
 
         Collection<ChessMove> possibleMoves = new ArrayList<>(piece.pieceMoves(board, startPosition));
-        Collection<ChessMove> validMoves = new ArrayList<>();
+        Collection<ChessMove> legalMoves = new ArrayList<>();
 
         for (ChessMove move : possibleMoves) {
             ChessBoard boardCopy = new ChessBoard(board);
             makeMoveHelper(boardCopy, move, piece);
             if (!isInCheckHelper(piece.getTeamColor(), boardCopy)) {
-                validMoves.add(move);
+                legalMoves.add(move);
             }
         }
 
-        return validMoves;
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            addCastleMoves(legalMoves, startPosition);
+        }
+
+        return legalMoves;
     }
 
     /**
@@ -107,6 +111,7 @@ public class ChessGame {
             throw new InvalidMoveException("Illegal move");
         }
         makeMoveHelper(this.board, move, piece);
+        updateCastlingRights(piece, move);
         switchTurns();
 
     }
@@ -132,6 +137,13 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), piece);
     }
 
+
+    /**
+     * Updates castling rights based on the piece and move performed.
+     *
+     * @param piece the piece being moved
+     * @param move the move just made
+     */
     private void updateCastlingRights(ChessPiece piece, ChessMove move) {
         ChessPosition startPos = move.getStartPosition();
 
@@ -158,6 +170,33 @@ public class ChessGame {
                 }
             }
         }
+    }
+
+    private void addCastleMoves(Collection<ChessMove> moves, ChessPosition kingPos) {
+
+    }
+
+    private boolean canCastleKingside(TeamColor teamColor) {
+        if (teamColor == TeamColor.WHITE) {
+            if (whiteKingMoved || whiteKingsideRookMoved) return false;
+            if (isInCheck(teamColor)) return false;
+            if (board.getPiece(new ChessPosition(1, 6)) != null ||
+                board.getPiece(new ChessPosition(1, 7)) != null) return false;
+            if (isSquareAttacked(new ChessPosition(1, 6), TeamColor.BLACK) ||
+                isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK) return false;
+
+
+            return true;
+        }
+
+    }
+
+    private boolean canCastleQueenside(TeamColor teamColor) {
+
+    }
+
+    private boolean isSquareAttacked(ChessPosition square, TeamColor teamColor) {
+
     }
 
     /**
