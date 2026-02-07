@@ -181,9 +181,9 @@ public class ChessGame {
             if (whiteKingMoved || whiteKingsideRookMoved) return false;
             if (isInCheck(teamColor)) return false;
             if (board.getPiece(new ChessPosition(1, 6)) != null ||
-                board.getPiece(new ChessPosition(1, 7)) != null) return false;
+                    board.getPiece(new ChessPosition(1, 7)) != null) return false;
             if (isSquareAttacked(new ChessPosition(1, 6), TeamColor.BLACK) ||
-                isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK)) return false;
+                    isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK)) return false;
 
 
             return true;
@@ -218,7 +218,6 @@ public class ChessGame {
         }
         return false;
     }
-
 
     /**
      * Switches the turns of the game
@@ -258,8 +257,8 @@ public class ChessGame {
                 ChessPiece piece = board.getPiece(square);
                 if (
                         piece != null &&
-                        piece.getPieceType() == ChessPiece.PieceType.KING &&
-                        piece.getTeamColor() == teamColor
+                                piece.getPieceType() == ChessPiece.PieceType.KING &&
+                                piece.getTeamColor() == teamColor
                 ) {
                     kingPos = square;
                     break;
