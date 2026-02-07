@@ -132,6 +132,34 @@ public class ChessGame {
         board.addPiece(move.getEndPosition(), piece);
     }
 
+    private void updateCastlingRights(ChessPiece piece, ChessMove move) {
+        ChessPosition startPos = move.getStartPosition();
+
+        if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+            if (piece.getTeamColor() == TeamColor.WHITE) {
+                whiteKingMoved = true;
+            } else {
+                blackKingMoved = true;
+            }
+        }
+
+        if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+            if (piece.getTeamColor() == TeamColor.WHITE) {
+                if (startPos.equals(new ChessPosition(1, 1))) {
+                    whiteQueensideRookMoved = true;
+                } else if (startPos.equals(new ChessPosition(1, 8))) {
+                    whiteKingsideRookMoved = true;
+                }
+            } else {
+                if (startPos.equals(new ChessPosition(8, 1))) {
+                    blackQueensideRookMoved = true;
+                } else if (startPos.equals(new ChessPosition(8, 8))) {
+                    blackKingsideRookMoved = true;
+                }
+            }
+        }
+    }
+
     /**
      * Switches the turns of the game
      *
