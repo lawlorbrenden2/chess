@@ -192,6 +192,8 @@ public class ChessGame {
                 }
             }
         }
+
+        if (piece.getPieceType() == )
     }
 
     private void addCastleMoves(Collection<ChessMove> moves, ChessPosition kingPos, ChessPiece kingPiece, ChessBoard board) {
@@ -230,15 +232,15 @@ public class ChessGame {
             if (isInCheck(teamColor)) return false;
             if (board.getPiece(new ChessPosition(8, 6)) != null ||
                 board.getPiece(new ChessPosition(8, 7)) != null) return false;
-            if (isSquareAttacked(new ChessPosition(8, 6), TeamColor.BLACK, board) ||
-                isSquareAttacked(new ChessPosition(8, 7), TeamColor.BLACK, board)) return false;
+            if (isSquareAttacked(new ChessPosition(8, 6), TeamColor.WHITE, board) ||
+                isSquareAttacked(new ChessPosition(8, 7), TeamColor.WHITE, board)) return false;
             return true;
         }
     }
 
     private boolean canCastleQueenside(TeamColor teamColor, ChessBoard board) {
         ChessPosition rookPos = (teamColor == TeamColor.WHITE)
-                ? new ChessPosition(1, 1) : new ChessPosition(1, 8);
+                ? new ChessPosition(1, 1) : new ChessPosition(8, 1);
 
         ChessPiece rook = board.getPiece(rookPos);
         if (rook == null || rook.getPieceType() != ChessPiece.PieceType.ROOK) {
