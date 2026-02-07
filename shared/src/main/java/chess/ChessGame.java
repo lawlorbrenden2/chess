@@ -76,6 +76,7 @@ public class ChessGame {
         Collection<ChessMove> possibleMoves = new ArrayList<>(piece.pieceMoves(board, startPosition));
         Collection<ChessMove> legalMoves = new ArrayList<>();
 
+        // normal moves
         for (ChessMove move : possibleMoves) {
             ChessBoard boardCopy = new ChessBoard(board);
             makeMoveHelper(boardCopy, move, piece);
@@ -84,9 +85,22 @@ public class ChessGame {
             }
         }
 
+        // castling moves
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
             ChessBoard boardCopy = new ChessBoard(board);
             addCastleMoves(legalMoves, startPosition, piece, boardCopy);
+        }
+
+        // en passant
+        if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+            enPassantTarget != null) {
+            int forward = (piece.getTeamColor() == TeamColor.WHITE) ? 1 : -1;
+            int row = startPosition.getRow();
+            int col = startPosition.getColumn();
+            if ((Math.abs(enPassantTarget.getColumn()) - col == 1) && // check horizontal direction
+                (enPassantTarget.getRow() - row == forward)) { // check vertical direction
+                legalMoves.add(new ChessMove(startPosition, enPassantTarget, null));
+            }
         }
         return legalMoves;
     }
@@ -159,6 +173,8 @@ public class ChessGame {
                 board.addPiece(rookEndPos, rook);
             }
         }
+
+
     }
 
 
