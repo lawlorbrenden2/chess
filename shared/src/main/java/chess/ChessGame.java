@@ -193,7 +193,21 @@ public class ChessGame {
             }
         }
 
-        if (piece.getPieceType() == )
+//        if (piece.getPieceType() == ChessPiece.PieceType.KING && move.isCastling()) {
+//            if (piece.getTeamColor() == TeamColor.WHITE) {
+//                if (move.getEndPosition().getColumn() == 7) {
+//                    whiteKingsideRookMoved = true;
+//                } else {
+//                    whiteQueensideRookMoved = true;
+//                }
+//            } else {
+//                if (move.getEndPosition().getColumn() == 7) {
+//                    blackKingsideRookMoved = true;
+//                } else {
+//                    blackQueensideRookMoved = true;
+//                }
+//            }
+//        }
     }
 
     private void addCastleMoves(Collection<ChessMove> moves, ChessPosition kingPos, ChessPiece kingPiece, ChessBoard board) {
@@ -221,7 +235,7 @@ public class ChessGame {
 
         if (teamColor == TeamColor.WHITE) {
             if (whiteKingMoved || whiteKingsideRookMoved) return false;
-            if (isInCheck(teamColor)) return false;
+            if (isInCheckHelper(teamColor, board)) return false;
             if (board.getPiece(new ChessPosition(1, 6)) != null ||
                 board.getPiece(new ChessPosition(1, 7)) != null) return false;
             if (isSquareAttacked(new ChessPosition(1, 6), TeamColor.BLACK, board) ||
@@ -229,7 +243,7 @@ public class ChessGame {
             return true;
         } else {
             if (blackKingMoved || blackKingsideRookMoved) return false;
-            if (isInCheck(teamColor)) return false;
+            if (isInCheckHelper(teamColor, board)) return false;
             if (board.getPiece(new ChessPosition(8, 6)) != null ||
                 board.getPiece(new ChessPosition(8, 7)) != null) return false;
             if (isSquareAttacked(new ChessPosition(8, 6), TeamColor.WHITE, board) ||
@@ -249,22 +263,18 @@ public class ChessGame {
 
         if (teamColor == TeamColor.WHITE) {
             if (whiteKingMoved || whiteQueensideRookMoved) return false;
-            if (isInCheck(teamColor)) return false;
-            if (board.getPiece(new ChessPosition(1, 2)) != null ||
-                board.getPiece(new ChessPosition(1, 3)) != null ||
+            if (isInCheckHelper(teamColor, board)) return false;
+            if (board.getPiece(new ChessPosition(1, 3)) != null ||
                 board.getPiece(new ChessPosition(1, 4)) != null) return false;
-            if (isSquareAttacked(new ChessPosition(1, 2), TeamColor.BLACK, board) ||
-                isSquareAttacked(new ChessPosition(1, 3), TeamColor.BLACK, board) ||
+            if (isSquareAttacked(new ChessPosition(1, 3), TeamColor.BLACK, board) ||
                 isSquareAttacked(new ChessPosition(1, 4), TeamColor.BLACK, board)) return false;
             return true;
         } else {
             if (blackKingMoved || blackQueensideRookMoved) return false;
-            if (isInCheck(teamColor)) return false;
-            if (board.getPiece(new ChessPosition(8, 2)) != null ||
-                board.getPiece(new ChessPosition(8, 3)) != null ||
+            if (isInCheckHelper(teamColor, board)) return false;
+            if (board.getPiece(new ChessPosition(8, 3)) != null ||
                 board.getPiece(new ChessPosition(8, 4)) != null) return false;
-            if (isSquareAttacked(new ChessPosition(8, 2), TeamColor.WHITE, board) ||
-                isSquareAttacked(new ChessPosition(8, 3), TeamColor.WHITE, board) ||
+            if (isSquareAttacked(new ChessPosition(8, 3), TeamColor.WHITE, board) ||
                 isSquareAttacked(new ChessPosition(8, 4), TeamColor.WHITE, board)) return false;
             return true;
         }
@@ -424,4 +434,6 @@ public class ChessGame {
     public int hashCode() {
         return Objects.hash(board, teamTurn);
     }
+
+
 }

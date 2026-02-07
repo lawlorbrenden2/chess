@@ -108,6 +108,37 @@ public class ChessBoard {
     public int hashCode() {
         return Arrays.deepHashCode(squares);
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+
+        for (int r = 8; r >= 1; r--) {
+            sb.append("|");
+            for (int c = 1; c <= 8; c++) {
+                ChessPiece piece = getPiece(new ChessPosition(r, c));
+                if (piece == null) {
+                    sb.append(" |");
+                } else {
+                    char ch = switch (piece.getPieceType()) {
+                        case KING -> 'k';
+                        case QUEEN -> 'q';
+                        case ROOK -> 'r';
+                        case BISHOP -> 'b';
+                        case KNIGHT -> 'n';
+                        case PAWN -> 'p';
+                    };
+                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        ch = Character.toUpperCase(ch);
+                    }
+                    sb.append(ch).append("|");
+                }
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
 }
 
 
