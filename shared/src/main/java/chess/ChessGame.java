@@ -183,16 +183,41 @@ public class ChessGame {
             if (board.getPiece(new ChessPosition(1, 6)) != null ||
                     board.getPiece(new ChessPosition(1, 7)) != null) return false;
             if (isSquareAttacked(new ChessPosition(1, 6), TeamColor.BLACK) ||
-                    isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK)) return false;
-
-
+                isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK)) return false;
+            return true;
+        } else {
+            if (blackKingMoved || blackKingsideRookMoved) return false;
+            if (isInCheck(teamColor)) return false;
+            if (board.getPiece(new ChessPosition(8, 6)) != null ||
+                board.getPiece(new ChessPosition(8, 7)) != null) return false;
+            if (isSquareAttacked(new ChessPosition(8, 6), TeamColor.BLACK) ||
+                isSquareAttacked(new ChessPosition(8, 7), TeamColor.BLACK)) return false;
             return true;
         }
-        return true;
     }
 
     private boolean canCastleQueenside(TeamColor teamColor) {
-        return true;
+        if (teamColor == TeamColor.WHITE) {
+            if (whiteKingMoved || whiteQueensideRookMoved) return false;
+            if (isInCheck(teamColor)) return false;
+            if (board.getPiece(new ChessPosition(1, 2)) != null ||
+                board.getPiece(new ChessPosition(1, 3)) != null ||
+                board.getPiece(new ChessPosition(1, 4)) != null) return false;
+            if (isSquareAttacked(new ChessPosition(1, 2), TeamColor.BLACK) ||
+                isSquareAttacked(new ChessPosition(1, 3), TeamColor.BLACK) ||
+                isSquareAttacked(new ChessPosition(1, 4), TeamColor.BLACK)) return false;
+            return true;
+        } else {
+            if (blackKingMoved || blackQueensideRookMoved) return false;
+            if (isInCheck(teamColor)) return false;
+            if (board.getPiece(new ChessPosition(8, 2)) != null ||
+                board.getPiece(new ChessPosition(8, 3)) != null ||
+                board.getPiece(new ChessPosition(8, 4)) != null) return false;
+            if (isSquareAttacked(new ChessPosition(8, 2), TeamColor.WHITE) ||
+                isSquareAttacked(new ChessPosition(8, 3), TeamColor.WHITE) ||
+                isSquareAttacked(new ChessPosition(8, 4), TeamColor.WHITE)) return false;
+            return true;
+        }
     }
 
     private boolean isSquareAttacked(ChessPosition square, TeamColor attackingTeam) {
