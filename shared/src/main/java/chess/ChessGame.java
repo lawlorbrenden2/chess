@@ -20,6 +20,7 @@ public class ChessGame {
     private boolean blackKingsideRookMoved;
     private boolean whiteQueensideRookMoved;
     private boolean blackQueensideRookMoved;
+    private ChessPosition enPassantTarget;
 
 
     public ChessGame() {
@@ -32,6 +33,7 @@ public class ChessGame {
         blackKingsideRookMoved = false;
         whiteQueensideRookMoved = false;
         blackQueensideRookMoved = false;
+        enPassantTarget = null;
     }
 
     /**
