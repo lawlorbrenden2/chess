@@ -209,6 +209,14 @@ public class ChessGame {
 
 
     private boolean canCastleKingside(TeamColor teamColor, ChessBoard board) {
+        ChessPosition rookPos = (teamColor == TeamColor.WHITE)
+           ? new ChessPosition(1, 8) : new ChessPosition(8, 8);
+
+        ChessPiece rook = board.getPiece(rookPos);
+        if (rook == null || rook.getPieceType() != ChessPiece.PieceType.ROOK) {
+            return false;
+        }
+
         if (teamColor == TeamColor.WHITE) {
             if (whiteKingMoved || whiteKingsideRookMoved) return false;
             if (isInCheck(teamColor)) return false;
@@ -229,6 +237,14 @@ public class ChessGame {
     }
 
     private boolean canCastleQueenside(TeamColor teamColor, ChessBoard board) {
+        ChessPosition rookPos = (teamColor == TeamColor.WHITE)
+                ? new ChessPosition(1, 1) : new ChessPosition(1, 8);
+
+        ChessPiece rook = board.getPiece(rookPos);
+        if (rook == null || rook.getPieceType() != ChessPiece.PieceType.ROOK) {
+            return false;
+        }
+
         if (teamColor == TeamColor.WHITE) {
             if (whiteKingMoved || whiteQueensideRookMoved) return false;
             if (isInCheck(teamColor)) return false;
