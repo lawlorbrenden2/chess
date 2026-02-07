@@ -83,9 +83,8 @@ public class ChessGame {
         }
 
         if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-            addCastleMoves(legalMoves, startPosition);
+            addCastleMoves(legalMoves, startPosition, piece);
         }
-
         return legalMoves;
     }
 
@@ -172,8 +171,26 @@ public class ChessGame {
         }
     }
 
-    private void addCastleMoves(Collection<ChessMove> moves, ChessPosition kingPos) {
-
+    private void addCastleMoves(Collection<ChessMove> moves, ChessPosition kingPos, ChessPiece kingPiece) {
+        TeamColor teamColor = kingPiece.getTeamColor();
+        if (canCastleKingside(teamColor)) {
+            if (teamColor == TeamColor.WHITE) {
+                moves.add(new ChessMove(kingPos, new ChessPosition(1, 7), null));
+                moves.add(new ChessMove(new ChessPosition(1, 8), new ChessPosition(1, 6), null));
+            } else {
+                moves.add(new ChessMove(kingPos, new ChessPosition(8, 7), null));
+                moves.add(new ChessMove(new ChessPosition(8, 8), new ChessPosition(8, 6), null));
+            }
+        }
+        if (canCastleQueenside(teamColor)) {
+            if (teamColor == TeamColor.WHITE) {
+                moves.add(new ChessMove(kingPos, new ChessPosition(1, 3), null));
+                moves.add(new ChessMove(new ChessPosition(1, 1), new ChessPosition(1, 4), null));
+            } else {
+                moves.add(new ChessMove(kingPos, new ChessPosition(8, 3), null));
+                moves.add(new ChessMove(new ChessPosition(8, 1), new ChessPosition(8, 4), null));
+            }
+        }
     }
 
     private boolean canCastleKingside(TeamColor teamColor) {
@@ -181,7 +198,7 @@ public class ChessGame {
             if (whiteKingMoved || whiteKingsideRookMoved) return false;
             if (isInCheck(teamColor)) return false;
             if (board.getPiece(new ChessPosition(1, 6)) != null ||
-                    board.getPiece(new ChessPosition(1, 7)) != null) return false;
+                board.getPiece(new ChessPosition(1, 7)) != null) return false;
             if (isSquareAttacked(new ChessPosition(1, 6), TeamColor.BLACK) ||
                 isSquareAttacked(new ChessPosition(1, 7), TeamColor.BLACK)) return false;
             return true;
