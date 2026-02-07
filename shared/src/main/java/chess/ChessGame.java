@@ -193,23 +193,17 @@ public class ChessGame {
         }
     }
 
-    private boolean addCastleMoves(Collection<ChessMove> moves, ChessPosition kingPos, ChessPiece kingPiece) {
-        boolean added = false;
+    private void addCastleMoves(Collection<ChessMove> moves, ChessPosition kingPos, ChessPiece kingPiece) {
         TeamColor teamColor = kingPiece.getTeamColor();
-
         if (canCastleKingside(teamColor)) {
             ChessPosition target = (teamColor == TeamColor.WHITE) ? new ChessPosition(1, 7) : new ChessPosition(8, 7);
             moves.add(new ChessMove(kingPos, target, null, true));
-            added = true;
         }
 
         if (canCastleQueenside(teamColor)) {
             ChessPosition target = (teamColor == TeamColor.WHITE) ? new ChessPosition(1, 3) : new ChessPosition(8, 3);
             moves.add(new ChessMove(kingPos, target, null, true));
-            added = true;
         }
-
-        return added;
     }
 
 
