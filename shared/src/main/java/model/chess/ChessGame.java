@@ -1,4 +1,4 @@
-package chess;
+package model.chess;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,11 +1,12 @@
-package chess.piecemoves;
+package model.chess.piecemoves;
 
 import chess.*;
+import model.chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-import static chess.ChessGame.TeamColor.WHITE;
+import static model.chess.ChessGame.TeamColor.WHITE;
 
 class PawnMovesCalculator implements PieceMovesCalculator {
 

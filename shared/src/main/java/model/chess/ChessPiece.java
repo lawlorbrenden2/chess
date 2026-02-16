@@ -1,7 +1,7 @@
-package chess;
+package model.chess;
 
-import chess.piecemoves.PieceMovesCalculator;
-import chess.piecemoves.PieceMovesCalculatorFactory;
+import model.chess.piecemoves.PieceMovesCalculator;
+import model.chess.piecemoves.PieceMovesCalculatorFactory;
 
 import java.util.Collection;
 import java.util.Objects;

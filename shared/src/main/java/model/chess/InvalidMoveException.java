@@ -1,4 +1,4 @@
-package chess;
+package model.chess;
 
 /**
  * Indicates an invalid move was made in a game

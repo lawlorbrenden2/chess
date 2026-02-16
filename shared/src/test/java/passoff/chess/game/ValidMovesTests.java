@@ -1,8 +1,8 @@
 package passoff.chess.game;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import model.chess.ChessGame;
+import model.chess.ChessMove;
+import model.chess.ChessPosition;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
