@@ -1,4 +1,4 @@
 package model;
 
-public record CreateGameResult() {
+public record CreateGameResult(Integer gameID) {
 }
