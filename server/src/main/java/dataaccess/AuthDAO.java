@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.*;
+import model.data.AuthData;
 
 public interface AuthDAO {
     void createAuth(AuthData auth) throws DataAccessException;
