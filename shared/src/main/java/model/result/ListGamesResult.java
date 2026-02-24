@@ -1,4 +1,6 @@
-package model;
+package model.result;
+
+import model.data.GameData;
 
 import java.util.List;
 
