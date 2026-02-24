@@ -1,6 +1,9 @@
 package dataaccess;
 
 import model.*;
+import model.data.GameData;
+
+import java.util.List;
 
 public interface GameDAO {
     int createGame(GameData game) throws DataAccessException; // returns gameID
