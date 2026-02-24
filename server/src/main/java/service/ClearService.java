@@ -1,5 +1,5 @@
 package service;
 
 public class ClearService {
-    public void clear(ClearRequest clearRequest) {}
+    public void clear(ClearRequest clearGameRequest) {}
 }
