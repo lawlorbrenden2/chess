@@ -3,13 +3,15 @@ package server.handlers;
 import dataaccess.DataAccessException;
 import model.request.RegisterRequest;
 import model.result.RegisterResult;
+import org.jetbrains.annotations.NotNull;
 import service.UserService;
 import com.google.gson.Gson;
 import service.AlreadyTakenException;
 import io.javalin.http.Context;
+import io.javalin.http.Handler;
 
 
-public class RegisterHandler {
+public class RegisterHandler implements Handler {
     private final UserService userService;
     private final Gson gson = new Gson();
 
@@ -17,7 +19,8 @@ public class RegisterHandler {
         this.userService = userService;
     }
 
-    public void handleRegister(Context ctx) {
+    @Override
+    public void handle(@NotNull Context ctx) {
         try {
             RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
             RegisterResult result = userService.register(request);
