@@ -1,6 +1,5 @@
 package model.chess.piecemoves;
 
-import chess.*;
 import model.chess.ChessBoard;
 import model.chess.ChessMove;
 import model.chess.ChessPosition;
