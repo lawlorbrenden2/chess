@@ -24,8 +24,7 @@ public class RegisterHandler implements Handler {
         try {
             RegisterRequest request = gson.fromJson(ctx.body(), RegisterRequest.class);
             RegisterResult result = userService.register(request);
-            ctx.status(200);
-            ctx.json(result);
+            ctx.result(new Gson().toJson(result));
         } catch (Exception e) {
             handleException(e, ctx);
         }
