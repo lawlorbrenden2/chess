@@ -1,4 +1,4 @@
 package server.handlers;
 
-public class CreateGameHandler extends BaseHandler {
+public class CreateGameHandler {
 }

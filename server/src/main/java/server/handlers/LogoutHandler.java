@@ -1,4 +1,4 @@
 package server.handlers;
 
-public class LogoutHandler extends BaseHandler {
+public class LogoutHandler {
 }
