@@ -43,6 +43,8 @@ public class UserService {
         return new RegisterResult(request.username(), token);
     }
 
-    public LoginResult login(LoginRequest loginRequest) {}
+    public LoginResult login(LoginRequest loginRequest) {
+        return new LoginResult("user", "auth");
+    }
     public void logout(LogoutRequest logoutRequest) {}
 }
