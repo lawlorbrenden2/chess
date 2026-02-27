@@ -2,6 +2,7 @@ package server;
 
 import dataaccess.*;
 import io.javalin.*;
+import server.handlers.LoginHandler;
 import server.handlers.RegisterHandler;
 import service.UserService;
 
@@ -19,6 +20,9 @@ public class Server {
         // Register your endpoints and exception handlers here.
         RegisterHandler registerHandler = new RegisterHandler(userService);
         javalin.post("/user", registerHandler);
+
+        LoginHandler loginHandler = new LoginHandler(userService);
+        javalin.post("/session", loginHandler);
 
     }
 

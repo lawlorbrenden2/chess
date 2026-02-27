@@ -1,14 +1,9 @@
 package server.handlers;
 
-import dataaccess.DataAccessException;
 import model.request.RegisterRequest;
 import model.result.RegisterResult;
-import org.jetbrains.annotations.NotNull;
 import service.UserService;
-import com.google.gson.Gson;
-import service.exceptions.AlreadyTakenException;
 import io.javalin.http.Context;
-import io.javalin.http.Handler;
 
 
 public class RegisterHandler extends BaseHandler<RegisterRequest, RegisterResult> {

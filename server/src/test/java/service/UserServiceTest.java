@@ -3,11 +3,12 @@ package service;
 
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
-import model.request.RegisterRequest;
-import model.result.RegisterResult;
+import model.request.*;
+import model.result.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.exceptions.AlreadyTakenException;
+import service.exceptions.UnauthorizedException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -40,6 +41,26 @@ public class UserServiceTest {
 
         assertThrows(AlreadyTakenException.class, () -> {
             userService.register(request);
+        });
+    }
+
+    @Test
+    void loginPositive() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest("user123", "pass67", "my_email@byu.edu");
+        userService.register(registerRequest);
+
+        LoginRequest loginRequest = new LoginRequest("user123", "pass67");
+        LoginResult result = userService.login(loginRequest);
+
+        assertEquals("user123", result.username());
+        assertNotNull(result.authToken());
+    }
+
+    @Test
+    void loginNegative() throws Exception {
+        LoginRequest request = new LoginRequest("idonotexist123hello", "pass123");
+        assertThrows(UnauthorizedException.class, () -> {
+            userService.login(request);
         });
     }
 }
