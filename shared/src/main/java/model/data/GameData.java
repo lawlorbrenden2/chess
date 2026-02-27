@@ -1,6 +1,6 @@
 package model.data;
 
-import model.chess.ChessGame;
+import chess.ChessGame;
 
 public record GameData(
         Integer gameID,

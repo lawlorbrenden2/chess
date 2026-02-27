@@ -1,8 +1,8 @@
 package passoff.chess;
 
-import model.chess.ChessMove;
-import model.chess.ChessPiece;
-import model.chess.ChessPosition;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,6 +1,6 @@
 package passoff.chess;
 
-import model.chess.*;
+import chess.*;
 import org.junit.jupiter.api.Assertions;
 
 import java.util.ArrayList;

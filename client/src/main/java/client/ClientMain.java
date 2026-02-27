@@ -1,7 +1,7 @@
 package client;
 
-import model.chess.ChessGame;
-import model.chess.ChessPiece;
+import chess.ChessGame;
+import chess.ChessPiece;
 
 public class ClientMain {
     public static void main(String[] args) {

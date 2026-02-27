@@ -1,9 +1,9 @@
 package passoff.chess.game;
 
-import model.chess.ChessGame;
-import model.chess.ChessMove;
-import model.chess.ChessPosition;
-import model.chess.InvalidMoveException;
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import passoff.chess.EqualsTestingUtility;
 import passoff.chess.TestUtilities;
 

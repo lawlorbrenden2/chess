@@ -1,8 +1,8 @@
-package model.chess.piecemoves;
+package chess.piecemoves;
 
-import model.chess.ChessBoard;
-import model.chess.ChessMove;
-import model.chess.ChessPosition;
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPosition;
 
 import java.util.Collection;
 

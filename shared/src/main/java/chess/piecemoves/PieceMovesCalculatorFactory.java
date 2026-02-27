@@ -1,6 +1,6 @@
-package model.chess.piecemoves;
+package chess.piecemoves;
 
-import model.chess.ChessPiece;
+import chess.ChessPiece;
 
 public class PieceMovesCalculatorFactory {
     public static PieceMovesCalculator getType(ChessPiece.PieceType type) {
