@@ -7,6 +7,7 @@ import model.request.RegisterRequest;
 import model.result.RegisterResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import service.exceptions.AlreadyTakenException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

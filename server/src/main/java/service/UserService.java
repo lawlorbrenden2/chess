@@ -11,6 +11,7 @@ import model.request.LogoutRequest;
 import model.request.RegisterRequest;
 import model.result.LoginResult;
 import model.result.RegisterResult;
+import service.exceptions.*;
 
 import java.util.UUID;
 
@@ -24,10 +25,14 @@ public class UserService {
         this.authDAO = authDAO;
     }
 
-    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, DataAccessException {
+    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, BadRequestException, DataAccessException {
+        if (request.username() == null || request.password() == null || request.email() == null) {
+            throw new BadRequestException("Error: Bad request");
+        }
+
         // check if username already exists
         if (userDAO.getUser(request.username()) != null) {
-            throw new AlreadyTakenException("Username already taken");
+            throw new AlreadyTakenException("Error: Already taken");
         }
 
         // create user data
@@ -40,11 +45,26 @@ public class UserService {
         authDAO.createAuth(auth);
 
         // return register result
-        return new RegisterResult(request.username(), token);
+        return new RegisterResult(user.username(), token);
     }
 
-    public LoginResult login(LoginRequest loginRequest) {
-        return new LoginResult("user", "auth");
+    public LoginResult login(LoginRequest request) throws BadRequestException, UnauthorizedException, DataAccessException {
+        if (request.username() == null || request.password() == null) {
+            throw new BadRequestException("Error: Bad request");
+        }
+
+        UserData user = userDAO.getUser(request.username());
+
+        if (user == null || !user.password().equals(request.password())) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        String token = UUID.randomUUID().toString();
+        AuthData auth = new AuthData(token, request.username());
+        authDAO.createAuth(auth);
+
+        return new LoginResult(user.username(), token);
     }
-    public void logout(LogoutRequest logoutRequest) {}
+
+    public void logout(LogoutRequest request) {}
 }
