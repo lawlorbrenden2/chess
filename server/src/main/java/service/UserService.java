@@ -10,6 +10,7 @@ import model.request.LoginRequest;
 import model.request.LogoutRequest;
 import model.request.RegisterRequest;
 import model.result.LoginResult;
+import model.result.LogoutResult;
 import model.result.RegisterResult;
 import service.exceptions.*;
 
@@ -66,5 +67,13 @@ public class UserService {
         return new LoginResult(user.username(), token);
     }
 
-    public void logout(LogoutRequest request) {}
+    public void logout(LogoutRequest request) throws UnauthorizedException, DataAccessException {
+        AuthData auth = authDAO.getAuth(request.authToken());
+
+        if (auth == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        authDAO.deleteAuth(auth.authToken());
+    }
 }

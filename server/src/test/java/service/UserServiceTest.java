@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.AuthDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.request.*;
@@ -13,14 +14,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
     private UserService userService;
+    private MemoryAuthDAO authDAO;
 
     @BeforeEach
     void setUp() {
         MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, authDAO);
     }
-
 
     @Test
     void registerPositive() throws Exception {
@@ -65,11 +66,20 @@ public class UserServiceTest {
 
     @Test
     void logoutPositive() throws Exception {
+        LogoutRequest request = new LogoutRequest("valid-token-123");
 
+        assertDoesNotThrow(() -> userService.logout(request));
+
+        assertNull(authDAO.getAuth("valid-token-123"));
     }
 
     @Test
     void logoutNegative() throws Exception {
+        LogoutRequest request = new LogoutRequest("invalid-token-452");
 
+        assertThrows(UnauthorizedException.class, () -> {
+            userService.logout(request);
+        });
     }
+
 }
