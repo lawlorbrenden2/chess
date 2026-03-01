@@ -10,7 +10,6 @@ import model.request.LoginRequest;
 import model.request.LogoutRequest;
 import model.request.RegisterRequest;
 import model.result.LoginResult;
-import model.result.LogoutResult;
 import model.result.RegisterResult;
 import service.exceptions.*;
 

@@ -3,6 +3,7 @@ package server;
 import dataaccess.*;
 import io.javalin.*;
 import server.handlers.LoginHandler;
+import server.handlers.LogoutHandler;
 import server.handlers.RegisterHandler;
 import service.UserService;
 
@@ -23,6 +24,9 @@ public class Server {
 
         LoginHandler loginHandler = new LoginHandler(userService);
         javalin.post("/session", loginHandler);
+
+        LogoutHandler logoutHandler = new LogoutHandler(userService);
+        javalin.post("/delete", logoutHandler);
 
     }
 
