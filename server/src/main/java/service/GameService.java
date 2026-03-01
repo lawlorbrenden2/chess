@@ -20,4 +20,5 @@ public class GameService {
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest) {
         return new JoinGameResult();
     }
+
 }

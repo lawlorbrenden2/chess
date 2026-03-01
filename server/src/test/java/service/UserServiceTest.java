@@ -1,6 +1,5 @@
 package service;
 
-
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.request.*;
@@ -62,5 +61,15 @@ public class UserServiceTest {
         assertThrows(UnauthorizedException.class, () -> {
             userService.login(request);
         });
+    }
+
+    @Test
+    void logoutPositive() throws Exception {
+
+    }
+
+    @Test
+    void logoutNegative() throws Exception {
+
     }
 }
