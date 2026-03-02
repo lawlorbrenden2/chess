@@ -1,6 +1,5 @@
 package service;
 
-import dataaccess.AuthDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import model.request.*;
@@ -66,11 +65,17 @@ public class UserServiceTest {
 
     @Test
     void logoutPositive() throws Exception {
-        LogoutRequest request = new LogoutRequest("valid-token-123");
+        RegisterRequest registerRequest = new RegisterRequest("user123", "pass67", "my_email@byu.edu");
+        userService.register(registerRequest);
 
-        assertDoesNotThrow(() -> userService.logout(request));
+        LoginRequest loginRequest = new LoginRequest("user123", "pass67");
+        LoginResult loginResult = userService.login(loginRequest);
 
-        assertNull(authDAO.getAuth("valid-token-123"));
+        LogoutRequest logoutRequest = new LogoutRequest(loginResult.authToken());
+
+        assertDoesNotThrow(() -> userService.logout(logoutRequest));
+
+        assertNull(authDAO.getAuth(loginResult.authToken()));
     }
 
     @Test
