@@ -26,7 +26,7 @@ public class Server {
         javalin.post("/session", loginHandler);
 
         LogoutHandler logoutHandler = new LogoutHandler(userService);
-        javalin.post("/delete", logoutHandler);
+        javalin.delete("/session", logoutHandler);
 
     }
 
