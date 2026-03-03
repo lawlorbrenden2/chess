@@ -15,6 +15,10 @@ public class UserServiceTest {
     private UserService userService;
     private MemoryAuthDAO authDAO;
 
+    private final String testUsername = "user123";
+    private final String testPassword = "pass67";
+    private final String testEmail = "my_email@byu.edu";
+
     @BeforeEach
     void setUp() {
         MemoryUserDAO userDAO = new MemoryUserDAO();
@@ -22,69 +26,56 @@ public class UserServiceTest {
         userService = new UserService(userDAO, authDAO);
     }
 
+    private RegisterResult registerTestUser() throws Exception {
+        RegisterRequest request = new RegisterRequest(testUsername, testPassword, testEmail);
+        return userService.register(request);
+    }
+
+    private LoginResult loginTestUser() throws Exception {
+        LoginRequest loginRequest = new LoginRequest(testUsername, testPassword);
+        return userService.login(loginRequest);
+    }
+
     @Test
     void registerPositive() throws Exception {
-        RegisterRequest request = new RegisterRequest("user123", "pass67", "my_email@byu.edu");
-        RegisterResult result = userService.register(request);
-
-        assertEquals("user123", result.username());
+        RegisterResult result = registerTestUser();
+        assertEquals(testUsername, result.username());
         assertNotNull(result.authToken());
     }
 
     @Test
     void registerNegative() throws Exception {
-        RegisterRequest request =
-                new RegisterRequest("user123", "pass67", "my_email@byu.edu");
-
-        userService.register(request);
-
-        assertThrows(AlreadyTakenException.class, () -> {
-            userService.register(request);
-        });
+        registerTestUser();
+        assertThrows(AlreadyTakenException.class, this::registerTestUser);
     }
 
     @Test
     void loginPositive() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("user123", "pass67", "my_email@byu.edu");
-        userService.register(registerRequest);
-
-        LoginRequest loginRequest = new LoginRequest("user123", "pass67");
-        LoginResult result = userService.login(loginRequest);
-
-        assertEquals("user123", result.username());
+        registerTestUser();
+        LoginResult result = loginTestUser();
+        assertEquals(testUsername, result.username());
         assertNotNull(result.authToken());
     }
 
     @Test
-    void loginNegative() throws Exception {
+    void loginNegative() {
         LoginRequest request = new LoginRequest("idonotexist123hello", "pass123");
-        assertThrows(UnauthorizedException.class, () -> {
-            userService.login(request);
-        });
+        assertThrows(UnauthorizedException.class, () -> userService.login(request));
     }
 
     @Test
     void logoutPositive() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest("user123", "pass67", "my_email@byu.edu");
-        userService.register(registerRequest);
-
-        LoginRequest loginRequest = new LoginRequest("user123", "pass67");
-        LoginResult loginResult = userService.login(loginRequest);
+        registerTestUser();
+        LoginResult loginResult = loginTestUser();
 
         LogoutRequest logoutRequest = new LogoutRequest(loginResult.authToken());
-
         assertDoesNotThrow(() -> userService.logout(logoutRequest));
-
         assertNull(authDAO.getAuth(loginResult.authToken()));
     }
 
     @Test
-    void logoutNegative() throws Exception {
+    void logoutNegative() {
         LogoutRequest request = new LogoutRequest("invalid-token-452");
-
-        assertThrows(UnauthorizedException.class, () -> {
-            userService.logout(request);
-        });
+        assertThrows(UnauthorizedException.class, () -> userService.logout(request));
     }
-
 }

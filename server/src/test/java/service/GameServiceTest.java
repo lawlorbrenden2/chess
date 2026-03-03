@@ -3,15 +3,21 @@ package service;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
+import model.request.CreateGameRequest;
 import model.request.LoginRequest;
 import model.request.RegisterRequest;
+import model.result.CreateGameResult;
 import model.result.LoginResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import service.exceptions.UnauthorizedException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
     private GameService gameService;
     private UserService userService;
+    private String authToken;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -26,7 +32,7 @@ public class GameServiceTest {
 
         LoginRequest loginRequest = new LoginRequest("user123", "pass67");
         LoginResult loginResult = userService.login(loginRequest);
-        String authToken = loginResult.authToken();
+        authToken = loginResult.authToken();
     }
 
     @Test
@@ -41,12 +47,20 @@ public class GameServiceTest {
 
     @Test
     void createGamePositive() throws Exception {
+        CreateGameRequest request = new CreateGameRequest(authToken, "game name test");
+        CreateGameResult result = gameService.createGame(request);
 
+        assertNotNull(result);
+        assertEquals(1, result.gameID());
     }
 
     @Test
     void createGameNegative() throws Exception {
+        CreateGameRequest request = new CreateGameRequest("fake auth 123", "game name test");
 
+        assertThrows(UnauthorizedException.class, () -> {
+            gameService.createGame(request);
+        });
     }
 
     @Test
