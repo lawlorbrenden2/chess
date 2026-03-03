@@ -8,7 +8,6 @@ import io.javalin.http.Handler;
 import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
 
-
 public abstract class BaseHandler<T, R> implements Handler {
         protected final Gson gson = new Gson();
 
