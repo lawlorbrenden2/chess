@@ -2,6 +2,8 @@ package dataaccess;
 
 import model.data.UserData;
 
+import java.util.List;
+
 public class SQLUserDAO implements UserDAO {
     @Override
     public void createUser(UserData user) throws DataAccessException {
@@ -11,6 +13,11 @@ public class SQLUserDAO implements UserDAO {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         return null;
+    }
+
+    @Override
+    public List<UserData> listUsers() throws DataAccessException {
+        return List.of();
     }
 
     @Override
