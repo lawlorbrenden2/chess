@@ -57,8 +57,12 @@ public class GameService {
     public JoinGameResult joinGame(JoinGameRequest request)
             throws BadRequestException, UnauthorizedException, AlreadyTakenException, DataAccessException {
 
+        if (request.gameID() == null || request.playerColor() == null || request.authToken() == null) {
+            throw new BadRequestException("Error: Bad request");
+        }
+
         GameData game = gameDAO.getGame(request.gameID());
-        if (request.playerColor() == null || request.authToken() == null || !game.gameID().equals(request.gameID())) {
+        if (game == null) {
             throw new BadRequestException("Error: Bad request");
         }
 

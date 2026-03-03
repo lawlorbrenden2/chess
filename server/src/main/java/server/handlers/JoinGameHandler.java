@@ -6,6 +6,7 @@ import service.GameService;
 import io.javalin.http.Context;
 
 
+
 public class JoinGameHandler extends BaseHandler<JoinGameRequest, JoinGameResult> {
 
     private final GameService gameService;
@@ -18,6 +19,7 @@ public class JoinGameHandler extends BaseHandler<JoinGameRequest, JoinGameResult
     protected JoinGameRequest parseRequest(Context ctx) {
         String authToken = ctx.header("Authorization");
         JoinGameRequest body = gson.fromJson(ctx.body(), JoinGameRequest.class);
+
         return new JoinGameRequest(authToken, body.playerColor(), body.gameID());
     }
 
