@@ -9,6 +9,7 @@ import model.request.ListGamesRequest;
 import model.result.CreateGameResult;
 import model.result.JoinGameResult;
 import model.result.ListGamesResult;
+import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
 
@@ -23,7 +24,9 @@ public class GameService {
         this.authDAO = authDAO;
     }
 
-    public ListGamesResult listGames(ListGamesRequest request) {
+    public ListGamesResult listGames(ListGamesRequest request)
+            throws UnauthorizedException, DataAccessException {
+
         return new ListGamesResult(new ArrayList<>());
     }
 
@@ -48,7 +51,40 @@ public class GameService {
     }
 
 
-    public JoinGameResult joinGame(JoinGameRequest request) {
+    public JoinGameResult joinGame(JoinGameRequest request)
+            throws BadRequestException, UnauthorizedException, AlreadyTakenException, DataAccessException {
+
+        GameData game = gameDAO.getGame(request.gameID());
+        if (request.playerColor() == null || request.authToken() == null || game.gameID() == null) {
+            throw new BadRequestException("Error: Bad request");
+        }
+
+        AuthData auth = authDAO.getAuth(request.authToken());
+
+        if (auth == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        GameData updatedGame;
+
+        switch(request.playerColor().toUpperCase()) {
+            case "WHITE" -> {
+                if (game.whiteUsername() != null) {
+                    throw new AlreadyTakenException("Error: Already taken");
+                }
+                updatedGame = new GameData(game.gameID(), auth.username(), game.blackUsername(), game.gameName());
+            }
+            case "BLACK" -> {
+                if (game.blackUsername() != null) {
+                    throw new AlreadyTakenException("Error: Already taken");
+                }
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(), auth.username(), game.gameName());
+            }
+            default -> throw new BadRequestException("Error: Bad request");
+        }
+
+        gameDAO.updateGame(updatedGame);
+
         return new JoinGameResult();
     }
 

@@ -1,12 +1,13 @@
 package service;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
+import model.data.GameData;
 import model.request.CreateGameRequest;
+import model.request.JoinGameRequest;
 import model.request.LoginRequest;
 import model.request.RegisterRequest;
 import model.result.CreateGameResult;
+import model.result.JoinGameResult;
 import model.result.LoginResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,12 +19,13 @@ public class GameServiceTest {
     private GameService gameService;
     private UserService userService;
     private String authToken;
+    private GameDAO gameDAO;
 
     @BeforeEach
     void setUp() throws Exception {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
+        UserDAO userDAO = new MemoryUserDAO();
+        gameDAO = new MemoryGameDAO();
+        AuthDAO authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);
 
@@ -33,6 +35,11 @@ public class GameServiceTest {
         LoginRequest loginRequest = new LoginRequest("user123", "pass67");
         LoginResult loginResult = userService.login(loginRequest);
         authToken = loginResult.authToken();
+    }
+
+    private CreateGameResult createGame(String authToken, String gameName) throws Exception {
+        CreateGameRequest request = new CreateGameRequest(authToken, gameName);
+        return gameService.createGame(request);
     }
 
     @Test
@@ -47,8 +54,7 @@ public class GameServiceTest {
 
     @Test
     void createGamePositive() throws Exception {
-        CreateGameRequest request = new CreateGameRequest(authToken, "game name test");
-        CreateGameResult result = gameService.createGame(request);
+        CreateGameResult result = createGame(authToken, "game name test");
 
         assertNotNull(result);
         assertEquals(1, result.gameID());
@@ -65,11 +71,25 @@ public class GameServiceTest {
 
     @Test
     void joinGamePositive() throws Exception {
+        CreateGameResult createGameResult = createGame(authToken, "game name test");
+        JoinGameRequest joinGameRequest = new JoinGameRequest(
+                authToken, "white", createGameResult.gameID());
 
+        assertDoesNotThrow(() -> gameService.joinGame(joinGameRequest));
+
+        gameService.joinGame(joinGameRequest);
+        GameData updated = gameDAO.getGame(createGameResult.gameID());
+        assertEquals("user123", updated.whiteUsername());
     }
 
     @Test
     void joinGameNegative() throws Exception {
+        CreateGameResult createGameResult = createGame(authToken, "game name test");
+        JoinGameRequest joinGameRequest = new JoinGameRequest(
+                "fake auth", "black", createGameResult.gameID());
 
+        assertThrows(UnauthorizedException.class, () -> {
+            gameService.joinGame(joinGameRequest);
+        });
     }
 }

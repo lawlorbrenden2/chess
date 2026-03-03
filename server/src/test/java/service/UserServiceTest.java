@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
+import dataaccess.UserDAO;
 import model.request.*;
 import model.result.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ public class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
+        UserDAO userDAO = new MemoryUserDAO();
         authDAO = new MemoryAuthDAO();
         userService = new UserService(userDAO, authDAO);
     }
