@@ -1,10 +1,6 @@
 package server.handlers;
 
-import dataaccess.DataAccessException;
-import model.request.RegisterRequest;
-import model.result.RegisterResult;
 import org.jetbrains.annotations.NotNull;
-import service.UserService;
 import com.google.gson.Gson;
 import service.exceptions.AlreadyTakenException;
 import io.javalin.http.Context;
@@ -14,12 +10,7 @@ import service.exceptions.UnauthorizedException;
 
 
 public abstract class BaseHandler<Request, Result> implements Handler {
-        protected final UserService userService;
         protected final Gson gson = new Gson();
-
-        protected BaseHandler(UserService userService) {
-            this.userService = userService;
-        }
 
         @Override
         public void handle(@NotNull Context ctx) {

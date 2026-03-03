@@ -7,8 +7,10 @@ import io.javalin.http.Context;
 
 
 public class LoginHandler extends BaseHandler<LoginRequest, LoginResult> {
+    private final UserService userService;
+
     public LoginHandler(UserService userService) {
-        super(userService);
+        this.userService = userService;
     }
 
     @Override

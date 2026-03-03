@@ -7,8 +7,11 @@ import io.javalin.http.Context;
 
 
 public class RegisterHandler extends BaseHandler<RegisterRequest, RegisterResult> {
+
+    private final UserService userService;
+
     public RegisterHandler(UserService userService) {
-        super(userService);
+        this.userService = userService;
     }
 
     @Override

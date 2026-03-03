@@ -9,11 +9,14 @@ import java.util.Map;
 
 public class MemoryGameDAO implements GameDAO {
     private final Map<Integer, GameData> games = new HashMap<>();
+    private int nextGameID = 1;
 
     @Override
     public int createGame(GameData game) throws DataAccessException {
-        games.put(game.gameID(), game);
-        return game.gameID();
+        int gameID = nextGameID++;
+        GameData gameData = new GameData(gameID, game.whiteUsername(), game.blackUsername(), game.gameName());
+        games.put(gameData.gameID(), gameData);
+        return gameData.gameID();
     }
 
     @Override

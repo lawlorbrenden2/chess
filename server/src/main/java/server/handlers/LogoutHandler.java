@@ -7,8 +7,11 @@ import io.javalin.http.Context;
 
 
 public class LogoutHandler extends BaseHandler<LogoutRequest, LogoutResult> {
+
+    private final UserService userService;
+
     public LogoutHandler(UserService userService) {
-        super(userService);
+        this.userService = userService;
     }
 
     @Override
