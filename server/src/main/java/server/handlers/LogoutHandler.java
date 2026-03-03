@@ -1,5 +1,6 @@
 package server.handlers;
 
+import model.request.ListGamesRequest;
 import model.request.LogoutRequest;
 import model.result.LogoutResult;
 import service.UserService;
@@ -16,7 +17,8 @@ public class LogoutHandler extends BaseHandler<LogoutRequest, LogoutResult> {
 
     @Override
     protected LogoutRequest parseRequest(Context ctx) {
-        return gson.fromJson(ctx.body(), LogoutRequest.class);
+        String authToken = ctx.header("Authorization");
+        return new LogoutRequest(authToken);
     }
 
     @Override
