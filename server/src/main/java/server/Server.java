@@ -2,10 +2,11 @@ package server;
 
 import dataaccess.*;
 import io.javalin.*;
-import model.request.JoinGameRequest;
 import server.handlers.*;
+import service.ClearService;
 import service.GameService;
 import service.UserService;
+
 
 public class Server {
 
@@ -20,6 +21,7 @@ public class Server {
 
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO, authDAO);
+        ClearService clearService = new ClearService(gameDAO, userDAO, authDAO);
 
         // Register your endpoints and exception handlers here.
         RegisterHandler registerHandler = new RegisterHandler(userService);
@@ -36,6 +38,12 @@ public class Server {
 
         JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
         javalin.put("/game", joinGameHandler);
+
+        ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
+        javalin.get("/game", listGamesHandler);
+
+        ClearHandler clearHandler = new ClearHandler(clearService);
+        javalin.delete("/db", clearHandler);
 
     }
 

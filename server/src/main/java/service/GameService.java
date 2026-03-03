@@ -13,7 +13,6 @@ import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
 
-import java.util.ArrayList;
 
 public class GameService {
     private final GameDAO gameDAO;
@@ -27,7 +26,12 @@ public class GameService {
     public ListGamesResult listGames(ListGamesRequest request)
             throws UnauthorizedException, DataAccessException {
 
-        return new ListGamesResult(new ArrayList<>());
+        AuthData auth = authDAO.getAuth(request.authToken());
+        if (auth == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        return new ListGamesResult(gameDAO.listGames());
     }
 
 
@@ -39,7 +43,6 @@ public class GameService {
         }
 
         AuthData auth = authDAO.getAuth(request.authToken());
-
         if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
@@ -60,7 +63,6 @@ public class GameService {
         }
 
         AuthData auth = authDAO.getAuth(request.authToken());
-
         if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }

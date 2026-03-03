@@ -2,12 +2,9 @@ package service;
 
 import dataaccess.*;
 import model.data.GameData;
-import model.request.CreateGameRequest;
-import model.request.JoinGameRequest;
-import model.request.LoginRequest;
-import model.request.RegisterRequest;
+import model.request.*;
 import model.result.CreateGameResult;
-import model.result.JoinGameResult;
+import model.result.ListGamesResult;
 import model.result.LoginResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,12 +41,36 @@ public class GameServiceTest {
 
     @Test
     void listGamesPositive() throws Exception {
+        CreateGameResult result1 = createGame(authToken, "game1");
+        CreateGameResult result2 = createGame(authToken, "game2");
+        CreateGameResult result3 = createGame(authToken, "game3");
 
+        ListGamesRequest listGamesRequest = new ListGamesRequest(authToken);
+        ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
+
+        assertEquals(3, listGamesResult.games().size());
+
+        assertEquals(result1.gameID(), listGamesResult.games().get(0).gameID());
+        assertEquals("game1", listGamesResult.games().get(0).gameName());
+
+        assertEquals(result2.gameID(), listGamesResult.games().get(1).gameID());
+        assertEquals("game2", listGamesResult.games().get(1).gameName());
+
+        assertEquals(result3.gameID(), listGamesResult.games().get(2).gameID());
+        assertEquals("game3", listGamesResult.games().get(2).gameName());
     }
 
     @Test
     void listGamesNegative() throws Exception {
+        createGame(authToken, "game1");
+        createGame(authToken, "game2");
+        createGame(authToken, "game3");
 
+        ListGamesRequest listGamesRequest = new ListGamesRequest("I am not real hahahahahaha");
+
+        assertThrows(UnauthorizedException.class, () -> {
+            gameService.listGames(listGamesRequest);
+        });
     }
 
     @Test
@@ -73,11 +94,10 @@ public class GameServiceTest {
     void joinGamePositive() throws Exception {
         CreateGameResult createGameResult = createGame(authToken, "game name test");
         JoinGameRequest joinGameRequest = new JoinGameRequest(
-                authToken, "white", createGameResult.gameID());
+                authToken, "wHiTe", createGameResult.gameID());
 
         assertDoesNotThrow(() -> gameService.joinGame(joinGameRequest));
 
-        gameService.joinGame(joinGameRequest);
         GameData updated = gameDAO.getGame(createGameResult.gameID());
         assertEquals("user123", updated.whiteUsername());
     }
