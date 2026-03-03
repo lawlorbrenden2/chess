@@ -5,7 +5,6 @@ import model.result.JoinGameResult;
 import service.GameService;
 import io.javalin.http.Context;
 
-
 public class JoinGameHandler extends BaseHandler<JoinGameRequest, JoinGameResult> {
 
     private final GameService gameService;
