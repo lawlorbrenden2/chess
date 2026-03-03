@@ -9,23 +9,23 @@ import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
 
 
-public abstract class BaseHandler<Request, Result> implements Handler {
+public abstract class BaseHandler<T, R> implements Handler {
         protected final Gson gson = new Gson();
 
         @Override
         public void handle(@NotNull Context ctx) {
             try {
-                Request request = parseRequest(ctx);
-                Result result = execute(request);
+                T request = parseRequest(ctx);
+                R result = execute(request);
                 ctx.result(new Gson().toJson(result));
             } catch (Exception e) {
                 handleException(e, ctx);
             }
         }
 
-        protected abstract Request parseRequest(Context ctx);
+        protected abstract T parseRequest(Context ctx);
 
-        protected abstract Result execute(Request request) throws Exception;
+        protected abstract R execute(T request) throws Exception;
 
         private void handleException(Exception ex, Context ctx) {
             if (ex instanceof BadRequestException) {
