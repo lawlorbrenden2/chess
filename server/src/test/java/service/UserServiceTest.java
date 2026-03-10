@@ -1,7 +1,7 @@
 package service;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.memorydao.MemoryAuthDAO;
+import dataaccess.memorydao.MemoryUserDAO;
 import dataaccess.UserDAO;
 import model.request.*;
 import model.result.*;

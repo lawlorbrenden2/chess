@@ -1,38 +1,34 @@
-package dataaccess;
+package dataaccess.sqldao;
 
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import model.data.AuthData;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
-public class MemoryAuthDAO implements AuthDAO {
-
-    private final Map<String, AuthData> auths = new HashMap<>();
-
+public class SQLAuthDAO implements AuthDAO {
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
-        auths.put(auth.authToken(), auth);
+
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
-        return auths.get(authToken);
+        return null;
     }
 
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
-        auths.remove(authToken);
+
     }
 
     @Override
     public List<AuthData> listAuths() throws DataAccessException {
-        return new ArrayList<>(auths.values());
+        return List.of();
     }
 
     @Override
     public void clear() throws DataAccessException {
-        auths.clear();
+
     }
 }
