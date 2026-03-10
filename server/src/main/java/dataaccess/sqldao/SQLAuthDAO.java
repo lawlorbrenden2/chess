@@ -7,6 +7,10 @@ import model.data.AuthData;
 import java.util.List;
 
 public class SQLAuthDAO implements AuthDAO {
+    public SQLAuthDAO() throws DataAccessException {
+        DatabaseConfigurer.configureDatabase();
+    }
+
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
 

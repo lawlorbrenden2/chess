@@ -7,6 +7,9 @@ import model.data.GameData;
 import java.util.List;
 
 public class SQLGameDAO implements GameDAO {
+    public SQLGameDAO() throws DataAccessException {
+        DatabaseConfigurer.configureDatabase();
+    }
     @Override
     public int createGame(GameData game) throws DataAccessException {
         return 0;

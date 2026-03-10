@@ -7,6 +7,9 @@ import model.data.UserData;
 import java.util.List;
 
 public class SQLUserDAO implements UserDAO {
+    public SQLUserDAO() throws DataAccessException {
+        DatabaseConfigurer.configureDatabase();
+    }
     @Override
     public void createUser(UserData user) throws DataAccessException {
 
