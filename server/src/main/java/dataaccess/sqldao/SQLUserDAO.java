@@ -5,17 +5,14 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.data.UserData;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
     public SQLUserDAO() throws DataAccessException {
         DatabaseConfigurer.configureDatabase();
     }
-
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
@@ -45,11 +42,26 @@ public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
 
     @Override
     public List<UserData> listUsers() throws DataAccessException {
-        return List.of();
+        var result = new ArrayList<UserData>();
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT json FROM users";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        String json = rs.getString("json");
+                        result.add(new Gson().fromJson(json, UserData.class));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to read data: " + e.getMessage());
+        }
+        return result;
     }
 
     @Override
     public void clear() throws DataAccessException {
-
+        var statement = "TRUNCATE users";
+        executeUpdate(statement);
     }
 }
