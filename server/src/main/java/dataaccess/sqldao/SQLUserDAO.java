@@ -5,6 +5,10 @@ import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.data.UserData;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
@@ -22,6 +26,20 @@ public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT json FROM users WHERE username=?";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String json = rs.getString("json");
+                        return new Gson().fromJson(json, UserData.class);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to read data: " + e.getMessage());
+        }
         return null;
     }
 
