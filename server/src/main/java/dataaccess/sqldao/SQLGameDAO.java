@@ -2,7 +2,6 @@ package dataaccess.sqldao;
 
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import dataaccess.memorydao.DatabaseConfigurer;
 import model.data.GameData;
 
 import java.util.List;

@@ -3,12 +3,11 @@ package dataaccess.sqldao;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
-import dataaccess.memorydao.DatabaseConfigurer;
 import model.data.UserData;
 
 import java.util.List;
 
-public class SQLUserDAO implements UserDAO {
+public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
     public SQLUserDAO() throws DataAccessException {
         DatabaseConfigurer.configureDatabase();
     }

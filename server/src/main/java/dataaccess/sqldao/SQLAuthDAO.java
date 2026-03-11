@@ -2,7 +2,6 @@ package dataaccess.sqldao;
 
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
-import dataaccess.memorydao.DatabaseConfigurer;
 import model.data.AuthData;
 
 import java.util.List;
