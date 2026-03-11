@@ -3,6 +3,7 @@ package dataaccess.sqldao;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
+import dataaccess.memorydao.DatabaseConfigurer;
 import model.data.UserData;
 
 import java.util.List;
@@ -15,9 +16,9 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        var statement = "INSERT INTO user (username, password, email, json) VALUES (?, ?, ?, ?)";
+        var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(user);
-
+        executeUpdate(statement, user.username(), user.password(), user.email(), json);
     }
 
     @Override

@@ -1,6 +1,7 @@
-package dataaccess.sqldao;
+package dataaccess.memorydao;
 
 import dataaccess.DataAccessException;
+import dataaccess.DatabaseManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
