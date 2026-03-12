@@ -1,14 +1,13 @@
 package service;
 
 import dataaccess.*;
-import dataaccess.memorydao.MemoryAuthDAO;
-import dataaccess.memorydao.MemoryGameDAO;
-import dataaccess.memorydao.MemoryUserDAO;
+
+import dataaccess.sqldao.SQLAuthDAO;
+import dataaccess.sqldao.SQLGameDAO;
+import dataaccess.sqldao.SQLUserDAO;
 import model.data.GameData;
 import model.request.*;
-import model.result.CreateGameResult;
-import model.result.ListGamesResult;
-import model.result.LoginResult;
+import model.result.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import service.exceptions.UnauthorizedException;
@@ -16,16 +15,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
     private GameService gameService;
-    private UserService userService;
     private String authToken;
     private GameDAO gameDAO;
 
     @BeforeEach
     void setUp() throws Exception {
-        UserDAO userDAO = new MemoryUserDAO();
-        gameDAO = new MemoryGameDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
-        userService = new UserService(userDAO, authDAO);
+        UserDAO userDAO = new SQLUserDAO();
+        gameDAO = new SQLGameDAO();
+        AuthDAO authDAO = new SQLAuthDAO();
+        UserService userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);
 
         RegisterRequest registerRequest = new RegisterRequest("user123", "pass67", "my_email@byu.edu");

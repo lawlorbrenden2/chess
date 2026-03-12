@@ -1,19 +1,14 @@
 package service;
 
 import dataaccess.*;
-import dataaccess.memorydao.MemoryAuthDAO;
-import dataaccess.memorydao.MemoryGameDAO;
-import dataaccess.memorydao.MemoryUserDAO;
-import model.request.ClearRequest;
-import model.request.CreateGameRequest;
-import model.request.LoginRequest;
+
+import dataaccess.sqldao.*;
+import model.request.*;
 import model.request.RegisterRequest;
 
 import model.result.RegisterResult;
 import org.junit.jupiter.api.Test;
-import service.exceptions.AlreadyTakenException;
-import service.exceptions.BadRequestException;
-import service.exceptions.UnauthorizedException;
+import service.exceptions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ClearServiceTest {
@@ -21,9 +16,9 @@ public class ClearServiceTest {
     @Test
     void clearTest() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
 
-        UserDAO userDAO = new MemoryUserDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
+        UserDAO userDAO = new SQLUserDAO();
+        GameDAO gameDAO = new SQLGameDAO();
+        AuthDAO authDAO = new SQLAuthDAO();
 
         UserService userService = new UserService(userDAO, authDAO);
         GameService gameService = new GameService(gameDAO, authDAO);

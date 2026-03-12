@@ -1,8 +1,10 @@
 package service;
 
-import dataaccess.memorydao.MemoryAuthDAO;
-import dataaccess.memorydao.MemoryUserDAO;
+import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
+import dataaccess.sqldao.SQLAuthDAO;
+import dataaccess.sqldao.SQLUserDAO;
 import model.request.*;
 import model.result.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,17 +16,20 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
     private UserService userService;
-    private MemoryAuthDAO authDAO;
+    private AuthDAO authDAO;
 
     private final String testUsername = "user123";
     private final String testPassword = "pass67";
     private final String testEmail = "my_email@byu.edu";
 
     @BeforeEach
-    void setUp() {
-        UserDAO userDAO = new MemoryUserDAO();
-        authDAO = new MemoryAuthDAO();
+    void setUp() throws DataAccessException {
+        UserDAO userDAO = new SQLUserDAO();
+        authDAO = new SQLAuthDAO();
         userService = new UserService(userDAO, authDAO);
+
+        userDAO.clear();
+        authDAO.clear();
     }
 
     private RegisterResult registerTestUser() throws Exception {
