@@ -81,7 +81,9 @@ public class UserService {
 
     private boolean verifyPassword(String username, String providedPassword) throws DataAccessException {
         UserData user = userDAO.getUser(username);
-        if (user == null) return false;
+        if (user == null) {
+            return false;
+        }
 
         String hashedPassword = user.password();
         return BCrypt.checkpw(providedPassword, hashedPassword);
