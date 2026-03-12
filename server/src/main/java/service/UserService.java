@@ -11,6 +11,7 @@ import model.request.LogoutRequest;
 import model.request.RegisterRequest;
 import model.result.LoginResult;
 import model.result.RegisterResult;
+import org.mindrot.jbcrypt.BCrypt;
 import service.exceptions.*;
 
 import java.util.UUID;
@@ -57,7 +58,7 @@ public class UserService {
 
         UserData user = userDAO.getUser(request.username());
 
-        if (user == null || !user.password().equals(request.password())) {
+        if (user == null || !verifyPassword(user.username(), request.password())) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
@@ -76,5 +77,13 @@ public class UserService {
         }
 
         authDAO.deleteAuth(auth.authToken());
+    }
+
+    private boolean verifyPassword(String username, String providedPassword) throws DataAccessException {
+        UserData user = userDAO.getUser(username);
+        if (user == null) return false;
+
+        String hashedPassword = user.password();
+        return BCrypt.checkpw(providedPassword, hashedPassword);
     }
 }

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import model.data.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,21 +17,25 @@ public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
+        String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(user);
-        executeUpdate(statement, user.username(), user.password(), user.email(), json);
+        executeUpdate(statement, user.username(), hashedPassword, user.email(), json);
     }
 
     @Override
     public UserData getUser(String username) throws DataAccessException {
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT json FROM users WHERE username=?";
+            var statement = "SELECT password, email, json FROM users WHERE username=?";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
+                        String hashedPassword = rs.getString("password");
+                        String email = rs.getString("email");
                         String json = rs.getString("json");
-                        return new Gson().fromJson(json, UserData.class);
+                        UserData user = new Gson().fromJson(json, UserData.class);
+                        return new UserData(user.username(), hashedPassword, email);
                     }
                 }
             }
@@ -44,12 +49,15 @@ public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
     public List<UserData> listUsers() throws DataAccessException {
         var result = new ArrayList<UserData>();
         try (Connection conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT json FROM users";
+            var statement = "SELECT password, email, json FROM users";
             try (PreparedStatement ps = conn.prepareStatement(statement)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
+                        String hashedPassword = rs.getString("password");
+                        String email = rs.getString("email");
                         String json = rs.getString("json");
-                        result.add(new Gson().fromJson(json, UserData.class));
+                        UserData user = new Gson().fromJson(json, UserData.class);
+                        result.add(new UserData(user.username(), hashedPassword, email));
                     }
                 }
             }
