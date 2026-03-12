@@ -6,7 +6,7 @@ import model.data.AuthData;
 
 import java.util.List;
 
-public class SQLAuthDAO implements AuthDAO {
+public class SQLAuthDAO extends BaseSQLDAO implements AuthDAO {
     public SQLAuthDAO() throws DataAccessException {
         DatabaseConfigurer.configureDatabase();
     }

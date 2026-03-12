@@ -6,7 +6,7 @@ import model.data.GameData;
 
 import java.util.List;
 
-public class SQLGameDAO implements GameDAO {
+public class SQLGameDAO extends BaseSQLDAO implements GameDAO {
     public SQLGameDAO() throws DataAccessException {
         DatabaseConfigurer.configureDatabase();
     }
