@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.InvalidMoveException;
 import dataaccess.sqldao.SQLGameDAO;
 import model.data.GameData;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,14 @@ public class GameDataAccessTest {
     void createGamePositive() throws DataAccessException {
         GameData gameData = new GameData(1, "myWhiteUser",
                             "myBlackUser", "game1", new ChessGame());
-        assertDoesNotThrow(() -> gameDAO.createGame(gameData));
+
+        int gameID = gameDAO.createGame(gameData);
+
+        GameData game = gameDAO.getGame(gameID);
+
+        assertNotNull(game);
+        assertNotNull(game.game());
+        assertNotNull(game.game().getBoard());
     }
 
     @Test
@@ -44,9 +52,8 @@ public class GameDataAccessTest {
 
     @Test
     void getGameNegative() throws DataAccessException {
-        GameData gameData = new GameData(1, "myWhiteUser",
-                "myBlackUser", "game1", new ChessGame());
-        assertDoesNotThrow(() -> gameDAO.getGame(gameData.gameID()));
+        GameData game = gameDAO.getGame(6769);
+        assertNull(game);
     }
 
     @Test
@@ -73,15 +80,57 @@ public class GameDataAccessTest {
     }
 
     @Test
-    void updateGamesPositive() throws DataAccessException {
-        GameData oldGameData = new GameData(1, "myWhiteUser",
-                "myBlackUser", "game1", new ChessGame());
-        gameDAO.createGame(oldGameData);
+    void updateGamesPositive() throws DataAccessException, InvalidMoveException {
 
-        GameData newGameData = new GameData(1, "myNewWhiteUser",
-                "myBlackUser", "game1", new ChessGame());
+        ChessGame game = new ChessGame();
+        GameData gameData = new GameData(
+                1,
+                null,
+                null,
+                "game1",
+                game
+        );
 
-        assertDoesNotThrow(() -> gameDAO.updateGame(newGameData));
+        int gameID = gameDAO.createGame(gameData);
+
+        GameData updated = new GameData(
+                gameID,
+                "whitePlayer",
+                "blackPlayer",
+                "game1",
+                game
+        );
+
+        gameDAO.updateGame(updated);
+        GameData updatedGame = gameDAO.getGame(gameID);
+
+        assertEquals("whitePlayer", updatedGame.whiteUsername());
+        assertEquals("blackPlayer", updatedGame.blackUsername());
+
+        var move = new chess.ChessMove(
+                new chess.ChessPosition(2,1),
+                new chess.ChessPosition(3,1),
+                null
+        );
+        game.makeMove(move);
+
+        updated = new GameData(
+                gameID,
+                "whitePlayer",
+                "blackPlayer",
+                "game1",
+                game
+        );
+
+        gameDAO.updateGame(updated);
+        GameData newMoves = gameDAO.getGame(gameID);
+
+        assertNull(
+                newMoves.game().getBoard().getPiece(new chess.ChessPosition(2,1))
+        );
+        assertNotNull(
+                newMoves.game().getBoard().getPiece(new chess.ChessPosition(3,1))
+        );
     }
 
     @Test
