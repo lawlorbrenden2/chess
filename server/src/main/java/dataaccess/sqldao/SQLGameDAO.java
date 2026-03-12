@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.data.GameData;
-import model.data.UserData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,7 +20,7 @@ public class SQLGameDAO extends BaseSQLDAO implements GameDAO {
     @Override
     public int createGame(GameData game) throws DataAccessException {
         var statement =
-                "INSERT INTO games (gameID, gameName, whiteUsername, blackUsername, json) VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO games (gameName, whiteUsername, blackUsername, json) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(game);
 
         return executeUpdate(statement, game.gameName(), game.whiteUsername(), game.blackUsername(), json);
@@ -67,7 +66,9 @@ public class SQLGameDAO extends BaseSQLDAO implements GameDAO {
 
     @Override
     public void updateGame(GameData game) throws DataAccessException {
-
+        var statement = "UPDATE games set gameName=?, whiteUsername=?, blackUsername=?, json=? WHERE gameID=?";
+        String json = new Gson().toJson(game);
+        executeUpdate(statement, game.gameName(), game.whiteUsername(), game.blackUsername(), json, game.gameID());
     }
 
     @Override
