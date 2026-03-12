@@ -26,6 +26,11 @@ public class GameServiceTest {
         UserService userService = new UserService(userDAO, authDAO);
         gameService = new GameService(gameDAO, authDAO);
 
+
+        userDAO.clear();
+        gameDAO.clear();
+        authDAO.clear();
+
         RegisterRequest registerRequest = new RegisterRequest("user123", "pass67", "my_email@byu.edu");
         userService.register(registerRequest);
 

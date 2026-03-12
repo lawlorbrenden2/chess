@@ -1,9 +1,12 @@
 package model.data;
 
+import chess.ChessGame;
+
 public record GameData(
         Integer gameID,
         String whiteUsername,
         String blackUsername,
-        String gameName
+        String gameName,
+        ChessGame game
 ) {
 }

@@ -26,7 +26,7 @@ public class GameDataAccessTest {
     }
 
     @Test
-    void createUserNegative() throws DataAccessException {
+    void createGameNegative() throws DataAccessException {
         GameData gameData = new GameData(1, "myWhiteUser",
                 "myBlackUser", "game1");
         gameDAO.createGame(gameData);
@@ -34,7 +34,7 @@ public class GameDataAccessTest {
     }
 
     @Test
-    void getUserPositive() throws DataAccessException {
+    void getGamePositive() throws DataAccessException {
         GameData gameData = new GameData(1, "myWhiteUser",
                 "myBlackUser", "game1");
         gameDAO.createGame(gameData);
@@ -42,14 +42,14 @@ public class GameDataAccessTest {
     }
 
     @Test
-    void getUserNegative() throws DataAccessException {
+    void getGameNegative() throws DataAccessException {
         GameData gameData = new GameData(1, "myWhiteUser",
                 "myBlackUser", "game1");
         assertDoesNotThrow(() -> gameDAO.getGame(gameData.gameID()));
     }
 
     @Test
-    void listUsersPositive() throws DataAccessException {
+    void listGamesPositive() throws DataAccessException {
         GameData gameData1 = new GameData(1, "myWhiteUser1",
                 "myBlackUser1", "game1");
         GameData gameData2 = new GameData(2, "myWhiteUser2",
@@ -65,7 +65,7 @@ public class GameDataAccessTest {
     }
 
     @Test
-    void listUsersNegative() throws DataAccessException {
+    void listGamesNegative() throws DataAccessException {
         var games = gameDAO.listGames();
         assertNotNull(games);
         assertEquals(0, games.size());
@@ -92,7 +92,7 @@ public class GameDataAccessTest {
     }
 
     @Test
-    void clearUsers() throws DataAccessException {
+    void clearGames() throws DataAccessException {
         GameData gameData1 = new GameData(1, "myWhiteUser1",
                 "myBlackUser1", "game1");
         GameData gameData3 = new GameData(3, "myWhiteUser3",

@@ -19,6 +19,12 @@ public class SQLGameDAO extends BaseSQLDAO implements GameDAO {
 
     @Override
     public int createGame(GameData game) throws DataAccessException {
+        for (GameData gameData: listGames()) {
+            if (gameData.gameName().equals(game.gameName())) {
+                throw new DataAccessException("Already exists");
+            }
+        }
+
         var statement =
                 "INSERT INTO games (gameName, whiteUsername, blackUsername, json) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(game);
