@@ -19,7 +19,8 @@ public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
     public void createUser(UserData user) throws DataAccessException {
         String hashedPassword = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
-        String json = new Gson().toJson(user);
+        UserData hashedUser = new UserData(user.username(), hashedPassword, user.email());
+        String json = new Gson().toJson(hashedUser);
         executeUpdate(statement, user.username(), hashedPassword, user.email(), json);
     }
 
@@ -34,8 +35,8 @@ public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
                         String hashedPassword = rs.getString("password");
                         String email = rs.getString("email");
                         String json = rs.getString("json");
-                        UserData user = new Gson().fromJson(json, UserData.class);
-                        return new UserData(user.username(), hashedPassword, email);
+                        UserData userData = new Gson().fromJson(json, UserData.class);
+                        return new UserData(userData.username(), hashedPassword, email);
                     }
                 }
             }
@@ -56,8 +57,8 @@ public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
                         String hashedPassword = rs.getString("password");
                         String email = rs.getString("email");
                         String json = rs.getString("json");
-                        UserData user = new Gson().fromJson(json, UserData.class);
-                        result.add(new UserData(user.username(), hashedPassword, email));
+                        UserData userData = new Gson().fromJson(json, UserData.class);
+                        result.add(new UserData(userData.username(), hashedPassword, email));
                     }
                 }
             }
