@@ -1,14 +1,10 @@
 package dataaccess;
 
-
 import dataaccess.sqldao.SQLAuthDAO;
-import dataaccess.sqldao.SQLGameDAO;
 import model.data.AuthData;
-import model.data.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.crypto.Data;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
