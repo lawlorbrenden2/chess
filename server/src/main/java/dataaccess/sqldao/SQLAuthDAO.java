@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import model.data.AuthData;
-import model.data.UserData;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
