@@ -16,7 +16,7 @@ public class SQLUserDAO extends BaseSQLDAO implements UserDAO {
 
     @Override
     public void createUser(UserData user) throws DataAccessException {
-        var statement = "INSERT INTO users (username, password, email, json) VALUES (?, ?, ?, ?)";
+        var statement = "INSERT INTO games (username, password, email, json) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(user);
         executeUpdate(statement, user.username(), user.password(), user.email(), json);
     }

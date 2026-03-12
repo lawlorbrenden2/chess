@@ -1,5 +1,6 @@
 package dataaccess.sqldao;
 
+import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.data.GameData;
@@ -10,9 +11,14 @@ public class SQLGameDAO extends BaseSQLDAO implements GameDAO {
     public SQLGameDAO() throws DataAccessException {
         DatabaseConfigurer.configureDatabase();
     }
+
     @Override
     public int createGame(GameData game) throws DataAccessException {
-        return 0;
+        var statement =
+                "INSERT INTO games (gameID, gameName, whiteUsername, blackUsername, json) VALUES (?, ?, ?, ?, ?)";
+        String json = new Gson().toJson(game);
+
+        return executeUpdate(statement, game.gameName(), game.whiteUsername(), game.blackUsername(), json);
     }
 
     @Override
