@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import dataaccess.sqldao.SQLGameDAO;
 import model.data.GameData;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,14 +22,14 @@ public class GameDataAccessTest {
     @Test
     void createGamePositive() throws DataAccessException {
         GameData gameData = new GameData(1, "myWhiteUser",
-                            "myBlackUser", "game1");
+                            "myBlackUser", "game1", new ChessGame());
         assertDoesNotThrow(() -> gameDAO.createGame(gameData));
     }
 
     @Test
     void createGameNegative() throws DataAccessException {
         GameData gameData = new GameData(1, "myWhiteUser",
-                "myBlackUser", "game1");
+                "myBlackUser", "game1", new ChessGame());
         gameDAO.createGame(gameData);
         assertThrows(DataAccessException.class, () -> gameDAO.createGame(gameData));
     }
@@ -36,7 +37,7 @@ public class GameDataAccessTest {
     @Test
     void getGamePositive() throws DataAccessException {
         GameData gameData = new GameData(1, "myWhiteUser",
-                "myBlackUser", "game1");
+                "myBlackUser", "game1", new ChessGame());
         gameDAO.createGame(gameData);
         assertDoesNotThrow(() -> gameDAO.getGame(gameData.gameID()));
     }
@@ -44,18 +45,18 @@ public class GameDataAccessTest {
     @Test
     void getGameNegative() throws DataAccessException {
         GameData gameData = new GameData(1, "myWhiteUser",
-                "myBlackUser", "game1");
+                "myBlackUser", "game1", new ChessGame());
         assertDoesNotThrow(() -> gameDAO.getGame(gameData.gameID()));
     }
 
     @Test
     void listGamesPositive() throws DataAccessException {
         GameData gameData1 = new GameData(1, "myWhiteUser1",
-                "myBlackUser1", "game1");
+                "myBlackUser1", "game1", new ChessGame());
         GameData gameData2 = new GameData(2, "myWhiteUser2",
-                "myBlackUser2", "game2");
+                "myBlackUser2", "game2", new ChessGame());
         GameData gameData3 = new GameData(3, "myWhiteUser3",
-                "myBlackUser3", "game3");
+                "myBlackUser3", "game3", new ChessGame());
 
         gameDAO.createGame(gameData1);
         gameDAO.createGame(gameData2);
@@ -74,11 +75,11 @@ public class GameDataAccessTest {
     @Test
     void updateGamesPositive() throws DataAccessException {
         GameData oldGameData = new GameData(1, "myWhiteUser",
-                "myBlackUser", "game1");
+                "myBlackUser", "game1", new ChessGame());
         gameDAO.createGame(oldGameData);
 
         GameData newGameData = new GameData(1, "myNewWhiteUser",
-                "myBlackUser", "game1");
+                "myBlackUser", "game1", new ChessGame());
 
         assertDoesNotThrow(() -> gameDAO.updateGame(newGameData));
     }
@@ -86,7 +87,7 @@ public class GameDataAccessTest {
     @Test
     void updateGamesNegative() throws DataAccessException {
         GameData newGameData = new GameData(1, "myNewWhiteUser",
-                "myBlackUser", "game1");
+                "myBlackUser", "game1", new ChessGame());
 
         assertDoesNotThrow(() -> gameDAO.updateGame(newGameData));
     }
@@ -94,9 +95,9 @@ public class GameDataAccessTest {
     @Test
     void clearGames() throws DataAccessException {
         GameData gameData1 = new GameData(1, "myWhiteUser1",
-                "myBlackUser1", "game1");
+                "myBlackUser1", "game1", new ChessGame());
         GameData gameData3 = new GameData(3, "myWhiteUser3",
-                "myBlackUser3", "game3");
+                "myBlackUser3", "game3", new ChessGame());
 
         gameDAO.createGame(gameData1);
         gameDAO.createGame(gameData3);

@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
 import model.data.AuthData;
 import model.data.GameData;
@@ -47,7 +48,8 @@ public class GameService {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
-        GameData game = new GameData(0, null, null, request.gameName());
+        GameData game = new GameData(0, null, null,
+                            request.gameName(), new ChessGame());
 
         int gameID = gameDAO.createGame(game);
         return new CreateGameResult(gameID);
@@ -78,13 +80,15 @@ public class GameService {
                 if (game.whiteUsername() != null) {
                     throw new AlreadyTakenException("Error: Already taken");
                 }
-                updatedGame = new GameData(game.gameID(), auth.username(), game.blackUsername(), game.gameName());
+                updatedGame = new GameData(game.gameID(), auth.username(), game.blackUsername(),
+                                    game.gameName(), game.game());
             }
             case "BLACK" -> {
                 if (game.blackUsername() != null) {
                     throw new AlreadyTakenException("Error: Already taken");
                 }
-                updatedGame = new GameData(game.gameID(), game.whiteUsername(), auth.username(), game.gameName());
+                updatedGame = new GameData(game.gameID(), game.whiteUsername(), auth.username(),
+                                    game.gameName(), game.game());
             }
             default -> throw new BadRequestException("Error: Bad request");
         }
