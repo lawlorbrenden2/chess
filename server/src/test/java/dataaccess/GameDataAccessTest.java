@@ -5,6 +5,8 @@ import model.data.GameData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.crypto.Data;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,6 +71,26 @@ public class GameDataAccessTest {
         var games = gameDAO.listGames();
         assertNotNull(games);
         assertEquals(0, games.size());
+    }
+
+    @Test
+    void updateGamesPositive() throws DataAccessException {
+        GameData oldGameData = new GameData(1, "myWhiteUser",
+                "myBlackUser", "game1");
+        gameDAO.createGame(oldGameData);
+
+        GameData newGameData = new GameData(1, "myNewWhiteUser",
+                "myBlackUser", "game1");
+
+        assertDoesNotThrow(() -> gameDAO.updateGame(newGameData));
+    }
+
+    @Test
+    void updateGamesNegative() throws DataAccessException {
+        GameData newGameData = new GameData(1, "myNewWhiteUser",
+                "myBlackUser", "game1");
+
+        assertDoesNotThrow(() -> gameDAO.updateGame(newGameData));
     }
 
     @Test
