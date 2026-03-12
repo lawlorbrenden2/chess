@@ -1,9 +1,10 @@
 package server;
 
 import dataaccess.*;
-import dataaccess.memorydao.MemoryAuthDAO;
-import dataaccess.memorydao.MemoryGameDAO;
-import dataaccess.memorydao.MemoryUserDAO;
+import dataaccess.memorydao.*;
+import dataaccess.sqldao.SQLAuthDAO;
+import dataaccess.sqldao.SQLGameDAO;
+import dataaccess.sqldao.SQLUserDAO;
 import io.javalin.*;
 import server.handlers.*;
 import service.ClearService;
@@ -16,38 +17,41 @@ public class Server {
     private final Javalin javalin;
 
     public Server() {
-        javalin = Javalin.create(config -> config.staticFiles.add("web"));
+        try {
+            javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
-        UserDAO userDAO = new MemoryUserDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+            UserDAO userDAO = new SQLUserDAO();
+            AuthDAO authDAO = new SQLAuthDAO();
+            GameDAO gameDAO = new SQLGameDAO();
 
-        UserService userService = new UserService(userDAO, authDAO);
-        GameService gameService = new GameService(gameDAO, authDAO);
-        ClearService clearService = new ClearService(gameDAO, userDAO, authDAO);
+            UserService userService = new UserService(userDAO, authDAO);
+            GameService gameService = new GameService(gameDAO, authDAO);
+            ClearService clearService = new ClearService(gameDAO, userDAO, authDAO);
 
-        // Register your endpoints and exception handlers here.
-        RegisterHandler registerHandler = new RegisterHandler(userService);
-        javalin.post("/user", registerHandler);
+            // Register your endpoints and exception handlers here.
+            RegisterHandler registerHandler = new RegisterHandler(userService);
+            javalin.post("/user", registerHandler);
 
-        LoginHandler loginHandler = new LoginHandler(userService);
-        javalin.post("/session", loginHandler);
+            LoginHandler loginHandler = new LoginHandler(userService);
+            javalin.post("/session", loginHandler);
 
-        LogoutHandler logoutHandler = new LogoutHandler(userService);
-        javalin.delete("/session", logoutHandler);
+            LogoutHandler logoutHandler = new LogoutHandler(userService);
+            javalin.delete("/session", logoutHandler);
 
-        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
-        javalin.post("/game", createGameHandler);
+            CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+            javalin.post("/game", createGameHandler);
 
-        JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
-        javalin.put("/game", joinGameHandler);
+            JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
+            javalin.put("/game", joinGameHandler);
 
-        ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
-        javalin.get("/game", listGamesHandler);
+            ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
+            javalin.get("/game", listGamesHandler);
 
-        ClearHandler clearHandler = new ClearHandler(clearService);
-        javalin.delete("/db", clearHandler);
-
+            ClearHandler clearHandler = new ClearHandler(clearService);
+            javalin.delete("/db", clearHandler);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to initialize SQL DAOs: " + e.getMessage(), e);
+        }
     }
 
     public int run(int desiredPort) {
