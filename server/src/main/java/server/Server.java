@@ -28,7 +28,6 @@ public class Server {
             GameService gameService = new GameService(gameDAO, authDAO);
             ClearService clearService = new ClearService(gameDAO, userDAO, authDAO);
 
-            // Register your endpoints and exception handlers here.
             RegisterHandler registerHandler = new RegisterHandler(userService);
             javalin.post("/user", registerHandler);
 
