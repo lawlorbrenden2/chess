@@ -1,8 +1,8 @@
 package server;
 
 import com.google.gson.Gson;
-import model.data.UserData;
-import model.result.RegisterResult;
+import model.request.*;
+import model.result.*;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,18 +18,57 @@ public class ServerFacade {
         this.serverURL = serverURL;
     }
 
-    public RegisterResult register(UserData user) throws Exception {
-        var request = buildRequest("POST", "/user", user);
+    public RegisterResult register(RegisterRequest registerRequest) throws Exception {
+        var request = buildRequest("POST", "/user", registerRequest, null);
         var response = sendRequest(request);
         return handleResponse(response, RegisterResult.class);
     }
 
-    private HttpRequest buildRequest(String method, String path, Object body) {
+    public LoginResult login(LoginRequest loginRequest) throws Exception {
+        var request = buildRequest("POST", "/session", loginRequest, null);
+        var response = sendRequest(request);
+        return handleResponse(response, LoginResult.class);
+    }
+
+    public LogoutResult logout(String authToken) throws Exception {
+        var request = buildRequest("DELETE", "/session", null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, null);
+    }
+
+    public ListGamesResult listGames(String authToken) throws Exception {
+        var request = buildRequest("GET", "/game", null, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, ListGamesResult.class);
+    }
+
+    public CreateGameResult createGame(CreateGameRequest createGameRequest, String authToken) throws Exception {
+        var request = buildRequest("POST", "/game", createGameRequest, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, CreateGameResult.class);
+    }
+
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String authToken) throws Exception {
+        var request = buildRequest("PUT", "/game", joinGameRequest, authToken);
+        var response = sendRequest(request);
+        return handleResponse(response, null);
+    }
+
+    public ClearResult clear() throws Exception {
+        var request = buildRequest("DELETE", "/db", null, null);
+        var response = sendRequest(request);
+        return handleResponse(response, null);
+    }
+
+    private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(serverURL + path))
                 .method(method, makeRequestBody(body));
         if (body != null) {
             request.setHeader("Content-Type", "application/json");
+        }
+        if (authToken != null) {
+            request.header("Authorization", authToken);
         }
         return request.build();
     }
@@ -46,7 +85,8 @@ public class ServerFacade {
         try {
             return client.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (Exception ex) {
-            throw new Exception("Server error: " + ex.getMessage(), ex);        }
+            throw new Exception("Server error: " + ex.getMessage(), ex);
+        }
     }
 
     private <T> T handleResponse(HttpResponse<String> response, Class<T> responseClass) throws Exception {
@@ -60,7 +100,7 @@ public class ServerFacade {
             throw new Exception("HTTP error: " + status);        }
 
         if (responseClass != null) {
-            return new Gson().fromJson(response.body(), responseClass);
+            return gson.fromJson(response.body(), responseClass);
         }
 
         return null;
