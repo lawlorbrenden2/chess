@@ -3,11 +3,14 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import model.result.*;
-import model.request.*;
+
+import model.request.CreateGameRequest;
+import model.request.JoinGameRequest;
+import model.request.LoginRequest;
+import model.request.RegisterRequest;
 import server.ServerFacade;
 import com.google.gson.Gson;
-import model.*;
+
 import static ui.EscapeSequences.*;
 
 public class ChessClient {
@@ -41,7 +44,8 @@ public class ChessClient {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + "[" + state + "] >>> " + SET_TEXT_COLOR_GREEN);
+        System.out.print("\n" + RESET_TEXT_COLOR + "[" + state + (username != null ? ":" + username : "")
+                + "] >>> " + SET_TEXT_COLOR_GREEN);
     }
 
     public String register(String... params) throws Exception {
@@ -90,9 +94,22 @@ public class ChessClient {
         var output = new StringBuilder();
         for (var game : result.games()) {
             output.append(game.gameID())
-                    .append(": ")
-                    .append(game.gameName())
-                    .append("\n");
+                  .append(": ")
+                  .append(game.gameName());
+
+            if (game.whiteUsername() != null) {
+                output.append(" [White: ").append(game.whiteUsername()).append("]");
+            }
+            else {
+                output.append(" [White: <available>]");
+            }
+            if (game.blackUsername() != null) {
+                output.append(" [Black: ").append(game.blackUsername()).append("]");
+            }
+            else {
+                output.append(" [Black: <available>]");
+            }
+            output.append("\n");
         }
         return output.toString();
     }
