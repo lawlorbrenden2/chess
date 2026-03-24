@@ -20,5 +20,19 @@ public class ChessBoardUI {
     public static void drawChessBoard(PrintStream out) {
         out.println(ERASE_SCREEN);
     }
+
+    public static void drawLetters(PrintStream out) {
+
+    }
+
+    public static void drawNumbers(PrintStream out) {
+
+    }
+
+    public static void drawSquares(PrintStream out) {
+
+    }
+
+
 }
 
