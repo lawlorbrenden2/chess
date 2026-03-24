@@ -128,9 +128,9 @@ public class ChessClient {
         return switch (cmd) {
             case "register" -> register(params);
             case "login" -> login(params);
-            case "createGame" -> createGame(params);
-            case "listGames" -> listGames();
-            case "joinGame" -> joinGame(params);
+            case "create" -> createGame(params);
+            case "list" -> listGames();
+            case "join" -> joinGame(params);
             case "logout" -> logout();
             case "quit" -> "quit";
             default -> help();
