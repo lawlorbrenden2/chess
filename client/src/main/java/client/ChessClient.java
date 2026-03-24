@@ -3,6 +3,8 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import model.request.LoginRequest;
+import model.request.RegisterRequest;
 import server.ServerFacade;
 import com.google.gson.Gson;
 import model.*;
@@ -41,27 +43,39 @@ public class ChessClient {
         System.out.print("\n" + RESET_TEXT_COLOR + "[" + state + "] >>> " + SET_TEXT_COLOR_GREEN);
     }
 
-    public String register(String... params) {
+    public String register(String... params) throws Exception {
+        if (params.length >= 3) {
+            var request = new RegisterRequest(params[0], params[1], params[2]);
+            var result = server.register(request);
+            authToken = result.authToken();
+            state = State.SIGNEDIN;
+        }
+        throw new Exception("Expected: <username> <password>");
+    }
+
+    public String login(String... params) throws Exception {
+        if (params.length >= 2) {
+            var request = new LoginRequest(params[0], params[1]);
+            var result = server.login(request);
+            authToken = result.authToken();
+            state = State.SIGNEDIN;
+        }
+        throw new Exception("Expected: <username> <password>");
+    }
+
+    public String listGames() throws Exception {
         return "";
     }
 
-    public String login(String... params) {
+    public String createGame(String... params) throws Exception {
         return "";
     }
 
-    public String listGames() {
+    public String joinGame(String... params) throws Exception {
         return "";
     }
 
-    public String createGame(String... params) {
-        return "";
-    }
-
-    public String joinGame(String... params) {
-        return "";
-    }
-
-    public String logout() {
+    public String logout() throws Exception {
         return "";
     }
 
