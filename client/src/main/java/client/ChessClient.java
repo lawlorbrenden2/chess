@@ -55,7 +55,7 @@ public class ChessClient {
 
             return "Registered as " + username;
         }
-        throw new Exception("Expected: <username> <password>");
+        throw new Exception("Expected: <username> <password> <email>");
     }
 
     public String login(String... params) throws Exception {
@@ -80,7 +80,7 @@ public class ChessClient {
 
             return "Created game with gameID: " + result.gameID();
         }
-        throw new Exception("Expected: <username> <password>");
+        throw new Exception("Expected: gameName");
     }
 
     public String listGames() throws Exception {
@@ -98,6 +98,7 @@ public class ChessClient {
     }
 
     public String joinGame(String... params) throws Exception {
+        assertSignedIn();
         if (params.length >= 2) {
             int gameID = Integer.parseInt(params[0]);
             String color = params[1].toUpperCase();
@@ -113,7 +114,8 @@ public class ChessClient {
     public String logout() throws Exception {
         assertSignedIn();
         server.logout();
-
+        username = null;
+        authToken = null;
         state = State.SIGNEDOUT;
         return "";
     }
