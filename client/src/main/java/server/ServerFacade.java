@@ -13,9 +13,14 @@ public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverURL;
     private final Gson gson = new Gson();
+    private String authToken;
 
     public ServerFacade(String serverURL) {
         this.serverURL = serverURL;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws Exception {
@@ -30,25 +35,25 @@ public class ServerFacade {
         return handleResponse(response, LoginResult.class);
     }
 
-    public LogoutResult logout(String authToken) throws Exception {
+    public LogoutResult logout() throws Exception {
         var request = buildRequest("DELETE", "/session", null, authToken);
         var response = sendRequest(request);
         return handleResponse(response, null);
     }
 
-    public ListGamesResult listGames(String authToken) throws Exception {
+    public ListGamesResult listGames() throws Exception {
         var request = buildRequest("GET", "/game", null, authToken);
         var response = sendRequest(request);
         return handleResponse(response, ListGamesResult.class);
     }
 
-    public CreateGameResult createGame(CreateGameRequest createGameRequest, String authToken) throws Exception {
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws Exception {
         var request = buildRequest("POST", "/game", createGameRequest, authToken);
         var response = sendRequest(request);
         return handleResponse(response, CreateGameResult.class);
     }
 
-    public JoinGameResult joinGame(JoinGameRequest joinGameRequest, String authToken) throws Exception {
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws Exception {
         var request = buildRequest("PUT", "/game", joinGameRequest, authToken);
         var response = sendRequest(request);
         return handleResponse(response, null);

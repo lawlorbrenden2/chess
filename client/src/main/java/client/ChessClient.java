@@ -3,6 +3,7 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import model.request.CreateGameRequest;
 import model.request.LoginRequest;
 import model.request.RegisterRequest;
 import server.ServerFacade;
@@ -14,6 +15,7 @@ public class ChessClient {
     private String authToken = null;
     private final ServerFacade server;
     private State state = State.SIGNEDOUT;
+    private String username;
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
@@ -48,6 +50,7 @@ public class ChessClient {
             var request = new RegisterRequest(params[0], params[1], params[2]);
             var result = server.register(request);
             authToken = result.authToken();
+            server.setAuthToken(authToken);
             state = State.SIGNEDIN;
         }
         throw new Exception("Expected: <username> <password>");
@@ -58,16 +61,27 @@ public class ChessClient {
             var request = new LoginRequest(params[0], params[1]);
             var result = server.login(request);
             authToken = result.authToken();
+            server.setAuthToken(authToken);
+            state = State.SIGNEDIN;
+
+            username = params[0];
+
+            return "Logged in as " + username;
+        }
+        throw new Exception("Expected: <username> <password>");
+    }
+
+    public String createGame(String... params) throws Exception {
+        if (params.length >= 1) {
+            var request = new CreateGameRequest(params[0], authToken);
+            server.createGame(request);
+
             state = State.SIGNEDIN;
         }
         throw new Exception("Expected: <username> <password>");
     }
 
     public String listGames() throws Exception {
-        return "";
-    }
-
-    public String createGame(String... params) throws Exception {
         return "";
     }
 
@@ -80,9 +94,9 @@ public class ChessClient {
     }
 
 
-    public String eval(String input) {
-        String[] tokens = input.toLowerCase().split(" ");
-        String cmd = (tokens.length > 0) ? tokens[0] : "help";
+    public String eval(String input) throws Exception {
+        String[] tokens = input.split(" ");
+        String cmd = (tokens.length > 0) ? tokens[0].toLowerCase() : "help";
         String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
         return switch (cmd) {
             case "register" -> register(params);
