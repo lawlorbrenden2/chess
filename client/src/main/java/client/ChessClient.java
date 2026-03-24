@@ -9,14 +9,13 @@ import model.request.JoinGameRequest;
 import model.request.LoginRequest;
 import model.request.RegisterRequest;
 import server.ServerFacade;
-import com.google.gson.Gson;
 
 import static ui.EscapeSequences.*;
 
 public class ChessClient {
     private String authToken = null;
     private final ServerFacade server;
-    private State state = State.SIGNEDOUT;
+    private State state = State.LOGGEDOUT;
     private String username;
 
     public ChessClient(String serverURL) {
@@ -54,7 +53,7 @@ public class ChessClient {
             var result = server.register(request);
             authToken = result.authToken();
             server.setAuthToken(authToken);
-            state = State.SIGNEDIN;
+            state = State.LOGGEDIN;
             username = params[0];
 
             return "Registered as " + username;
@@ -68,7 +67,7 @@ public class ChessClient {
             var result = server.login(request);
             authToken = result.authToken();
             server.setAuthToken(authToken);
-            state = State.SIGNEDIN;
+            state = State.LOGGEDIN;
             username = params[0];
 
             return "Logged in as " + username;
@@ -77,7 +76,7 @@ public class ChessClient {
     }
 
     public String createGame(String... params) throws Exception {
-        assertSignedIn();
+        assertLoggedIn();
         if (params.length >= 1) {
             var request = new CreateGameRequest(params[0], authToken);
             var result = server.createGame(request);
@@ -88,7 +87,7 @@ public class ChessClient {
     }
 
     public String listGames() throws Exception {
-        assertSignedIn();
+        assertLoggedIn();
         var result = server.listGames();
 
         var output = new StringBuilder();
@@ -115,7 +114,7 @@ public class ChessClient {
     }
 
     public String joinGame(String... params) throws Exception {
-        assertSignedIn();
+        assertLoggedIn();
         if (params.length >= 2) {
             int gameID = Integer.parseInt(params[0]);
             String color = params[1].toUpperCase();
@@ -129,11 +128,11 @@ public class ChessClient {
     }
 
     public String logout() throws Exception {
-        assertSignedIn();
+        assertLoggedIn();
         server.logout();
         username = null;
         authToken = null;
-        state = State.SIGNEDOUT;
+        state = State.LOGGEDOUT;
         return "";
     }
 
@@ -156,7 +155,7 @@ public class ChessClient {
 
 
     public String help() {
-        if (state == State.SIGNEDOUT) {
+        if (state == State.LOGGEDOUT) {
             return SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" +
                     SET_TEXT_COLOR_MAGENTA + " - to create an account\n" +
                     SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>" + SET_TEXT_COLOR_MAGENTA + " - to play chess\n" +
@@ -172,9 +171,9 @@ public class ChessClient {
                 SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
     }
 
-    private void assertSignedIn() throws Exception {
-        if (state == State.SIGNEDOUT) {
-            throw new Exception("You must sign in");
+    private void assertLoggedIn() throws Exception {
+        if (state == State.LOGGEDOUT) {
+            throw new Exception("You must log in!");
         }
     }
 

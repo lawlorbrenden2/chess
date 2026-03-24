@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import exception.ErrorResponse;
 import model.request.*;
 import model.result.*;
 
@@ -99,10 +100,21 @@ public class ServerFacade {
         if (!isSuccessful(status)) {
             var body = response.body();
             if (body != null) {
+                ErrorResponse error = null;
+
+                try {
+                    error = gson.fromJson(body, ErrorResponse.class);
+                } catch (Exception ignored) {
+                }
+
+                if (error != null && error.message() != null) {
+                    throw new Exception(error.message().replace("Error: ", ""));
+                }
+
                 throw new Exception("Server error: " + body);
             }
-
-            throw new Exception("HTTP error: " + status);        }
+            throw new Exception("HTTP error: " + status);
+        }
 
         if (responseClass != null) {
             return gson.fromJson(response.body(), responseClass);
