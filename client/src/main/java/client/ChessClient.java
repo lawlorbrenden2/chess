@@ -127,6 +127,11 @@ public class ChessClient {
         throw new Exception("Expected: <gameID> <WHITE|BLACK>");
     }
 
+    public String observeGame() throws Exception {
+        assertLoggedIn();
+        return "";
+    }
+
     public String logout() throws Exception {
         assertLoggedIn();
         server.logout();
@@ -147,12 +152,12 @@ public class ChessClient {
             case "create" -> createGame(params);
             case "list" -> listGames();
             case "join" -> joinGame(params);
+            case "observe" -> observeGame();
             case "logout" -> logout();
             case "quit" -> "quit";
             default -> help();
         };
     }
-
 
     public String help() {
         if (state == State.LOGGEDOUT) {
