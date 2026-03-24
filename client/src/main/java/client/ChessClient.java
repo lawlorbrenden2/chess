@@ -3,9 +3,8 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import model.request.CreateGameRequest;
-import model.request.LoginRequest;
-import model.request.RegisterRequest;
+import model.result.*;
+import model.request.*;
 import server.ServerFacade;
 import com.google.gson.Gson;
 import model.*;
@@ -52,6 +51,9 @@ public class ChessClient {
             authToken = result.authToken();
             server.setAuthToken(authToken);
             state = State.SIGNEDIN;
+            username = params[0];
+
+            return "Registered as " + username;
         }
         throw new Exception("Expected: <username> <password>");
     }
@@ -63,7 +65,6 @@ public class ChessClient {
             authToken = result.authToken();
             server.setAuthToken(authToken);
             state = State.SIGNEDIN;
-
             username = params[0];
 
             return "Logged in as " + username;
@@ -72,24 +73,48 @@ public class ChessClient {
     }
 
     public String createGame(String... params) throws Exception {
+        assertSignedIn();
         if (params.length >= 1) {
             var request = new CreateGameRequest(params[0], authToken);
-            server.createGame(request);
+            var result = server.createGame(request);
 
-            state = State.SIGNEDIN;
+            return "Created game with gameID: " + result.gameID();
         }
         throw new Exception("Expected: <username> <password>");
     }
 
     public String listGames() throws Exception {
-        return "";
+        assertSignedIn();
+        var result = server.listGames();
+
+        var output = new StringBuilder();
+        for (var game : result.games()) {
+            output.append(game.gameID())
+                    .append(": ")
+                    .append(game.gameName())
+                    .append("\n");
+        }
+        return output.toString();
     }
 
     public String joinGame(String... params) throws Exception {
-        return "";
+        if (params.length >= 2) {
+            int gameID = Integer.parseInt(params[0]);
+            String color = params[1].toUpperCase();
+            var request = new JoinGameRequest(authToken, color, gameID);
+            server.joinGame(request);
+
+            return "Joined game with gameID: " + gameID;
+        }
+
+        throw new Exception("Expected: <gameID> <WHITE|BLACK>");
     }
 
     public String logout() throws Exception {
+        assertSignedIn();
+        server.logout();
+
+        state = State.SIGNEDOUT;
         return "";
     }
 
@@ -126,6 +151,12 @@ public class ChessClient {
                 SET_TEXT_COLOR_BLUE + "logout" + SET_TEXT_COLOR_MAGENTA + " - when you are done\n" +
                 SET_TEXT_COLOR_BLUE + "quit" + SET_TEXT_COLOR_MAGENTA + " - playing chess\n" +
                 SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
+    }
+
+    private void assertSignedIn() throws Exception {
+        if (state == State.SIGNEDOUT) {
+            throw new Exception("You must sign in");
+        }
     }
 
 }
