@@ -37,7 +37,7 @@ public class ChessClient {
                 result = eval(line);
                 System.out.print(result);
             } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println(SET_TEXT_COLOR_RED + "Error: " + e.getMessage());
             }
         }
     }

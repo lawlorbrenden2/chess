@@ -108,7 +108,8 @@ public class ServerFacade {
                 }
 
                 if (error != null && error.message() != null) {
-                    throw new Exception(error.message().replace("Error: ", ""));
+                    String cleanMessage = error.message().replace("Error: ", "");
+                    throw new Exception(translateError(cleanMessage));
                 }
 
                 throw new Exception("Server error: " + body);
@@ -121,6 +122,14 @@ public class ServerFacade {
         }
 
         return null;
+    }
+
+    private String translateError(String message) {
+        return switch (message.toLowerCase()) {
+            case "unauthorized" -> "Invalid username or password.";
+            case "already taken" -> "Username already exists. Please choose another.";
+            default -> message;
+        };
     }
 
     private boolean isSuccessful(int status) {
