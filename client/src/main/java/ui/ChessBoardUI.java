@@ -74,7 +74,8 @@ public class ChessBoardUI {
             for (int col = startCol; isBlack ? col >= endCol : col <= endCol; col += colDirection) {
                 if ((row + col) % 2 == 0) {
                     out.print(DARK_SQUARE_COLOR);
-                } else {
+                }
+                else {
                     out.print(LIGHT_SQUARE_COLOR);
                 }
                 ChessPosition square = new ChessPosition(row + 1, col + 1);

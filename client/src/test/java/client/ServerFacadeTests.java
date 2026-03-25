@@ -20,7 +20,7 @@ public class ServerFacadeTests {
         server = new Server();
         String port = String.valueOf(server.run(0));
         System.out.println("Started test HTTP server on " + port);
-        serverFacade = new ServerFacade(port);
+        serverFacade = new ServerFacade("http://localhost:" + port);
     }
 
     @BeforeEach
@@ -59,7 +59,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void loginNegative() throws Exception {
+    public void loginNegative() {
         LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
         assertThrows(Exception.class, () -> serverFacade.login(loginRequest));
     }
@@ -77,7 +77,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void logoutNegative() throws Exception {
+    public void logoutNegative() {
         serverFacade.setAuthToken("faketoken");
         assertThrows(Exception.class, () -> serverFacade.logout());
     }
@@ -106,14 +106,8 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void listGamesNegative() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
-        serverFacade.register(registerRequest);
-
-        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
-        LoginResult loginResult = serverFacade.login(loginRequest);
-        serverFacade.setAuthToken(loginResult.authToken());
-
+    public void listGamesNegative() {
+        serverFacade.setAuthToken("nfake token");
         assertThrows(Exception.class, () -> serverFacade.listGames());
     }
 
@@ -132,15 +126,9 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void createGameNegative() throws Exception {
-        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
-        serverFacade.register(registerRequest);
-
-        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
-        LoginResult loginResult = serverFacade.login(loginRequest);
-        serverFacade.setAuthToken(loginResult.authToken());
-
-        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "gameName1");
+    public void createGameNegative() {
+        serverFacade.setAuthToken("bad_token");
+        CreateGameRequest createGameRequest = new CreateGameRequest(null, "gameName1");
         assertThrows(Exception.class, () -> serverFacade.createGame(createGameRequest));
     }
 
@@ -166,7 +154,6 @@ public class ServerFacadeTests {
     public void joinGameNegative() throws Exception {
         RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
         serverFacade.register(registerRequest);
-
         LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
         LoginResult loginResult = serverFacade.login(loginRequest);
         serverFacade.setAuthToken(loginResult.authToken());
@@ -174,11 +161,12 @@ public class ServerFacadeTests {
         CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "gameName1");
         CreateGameResult createGameResult = serverFacade.createGame(createGameRequest);
 
-        JoinGameRequest joinGameRequest =
-                new JoinGameRequest("bad auth token", "WHITE", createGameResult.gameID());
+        serverFacade.setAuthToken("evilToken");
+        JoinGameRequest joinGameRequest = new JoinGameRequest(null, "WHITE", createGameResult.gameID());
 
         assertThrows(Exception.class, () -> serverFacade.joinGame(joinGameRequest));
     }
+
 
     @Test
     public void clear() throws Exception {

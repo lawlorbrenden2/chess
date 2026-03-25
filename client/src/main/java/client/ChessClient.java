@@ -19,7 +19,7 @@ public class ChessClient {
     private State state = State.LOGGEDOUT;
     private String username;
     private String teamColor;
-    private java.util.List<Integer> gameIDMap = new java.util.ArrayList<>();
+    private final java.util.List<Integer> gameIDMap = new java.util.ArrayList<>();
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
@@ -143,22 +143,18 @@ public class ChessClient {
             if (gameIDMap.isEmpty()) {
                 throw new Exception("No games loaded. Run 'list' first");
             }
-
             if (gameNumber < 1 || gameNumber > gameIDMap.size()) {
                 System.out.println(gameIDMap);
-                throw new Exception("Invalid game number. Run 'list' to see valid games.");
+                throw new Exception("Invalid game number. Run 'list' to see valid games");
             }
-
             int gameID = gameIDMap.get(gameNumber - 1);
 
             String colorInput = params[1].toUpperCase();
-
             if (!colorInput.equals("WHITE") && !colorInput.equals("BLACK")) {
                 throw new Exception("Color must be WHITE or BLACK");
             }
 
             teamColor = colorInput;
-
             var request = new JoinGameRequest(authToken, teamColor, gameID);
             server.joinGame(request);
 
