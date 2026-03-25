@@ -3,11 +3,13 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import chess.ChessGame;
 import model.request.CreateGameRequest;
 import model.request.JoinGameRequest;
 import model.request.LoginRequest;
 import model.request.RegisterRequest;
 import server.ServerFacade;
+import ui.ChessBoardUI;
 
 import static ui.EscapeSequences.*;
 
@@ -158,7 +160,12 @@ public class ChessClient {
             var request = new JoinGameRequest(authToken, teamColor, gameID);
             server.joinGame(request);
 
-            return "Joined game with gameID: " + gameNumber + " and color " + teamColor;
+            String message = "Joined game with gameID: " + gameNumber + " and color " + teamColor;
+
+            ChessGame game = new ChessGame();
+            ChessBoardUI.drawChessBoard(game, teamColor);
+
+            return message;
         }
 
         throw new Exception("Expected: <game number> <WHITE|BLACK>");
@@ -179,7 +186,13 @@ public class ChessClient {
                 throw new Exception("Invalid game number.");
             }
 
-            return "Observing game " + gameNumber;
+            String message = "Joined game with gameID: " + gameNumber + " and color " + teamColor;
+
+            ChessGame game = new ChessGame();
+            ChessBoardUI.drawChessBoard(game, "WHITE"); // observers always observe from white pov
+
+            return message;
+
         }
 
         throw new Exception("Expected: <game number>");

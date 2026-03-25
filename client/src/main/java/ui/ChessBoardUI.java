@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -16,8 +17,17 @@ public class ChessBoardUI {
     private static final String[] ROW_LABELS = {"1", "2", "3", "4", "5", "6", "7", "8"};
     private static final String[] COLUMN_LABELS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
-    public static void drawChessBoard(PrintStream out, ChessBoard board) {
+    public static void drawChessBoard(ChessGame game, String teamColor) {
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.println(ERASE_SCREEN);
+
+        drawHorizontalBorder(out);
+    }
+
+    private static void drawHorizontalBorder(PrintStream out) {
+        for (int i = 1; i < BOARD_SIZE_IN_SQUARES + 2; i++) {
+            out.print(SET_BG_COLOR_LIGHT_GREY);
+        }
     }
 
     public static void drawLetters(PrintStream out) {
