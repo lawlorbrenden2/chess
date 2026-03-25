@@ -7,6 +7,7 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ServerFacadeTests {
 
@@ -38,14 +39,14 @@ public class ServerFacadeTests {
     public void registerPositive() throws Exception {
         RegisterRequest request = new RegisterRequest(user.username(), user.password(), user.email());
         RegisterResult result = serverFacade.register(request);
-        Assertions.assertNotNull(result.authToken());
+        assertNotNull(result.authToken());
     }
 
     @Test
     public void registerNegative() throws Exception {
         RegisterRequest request = new RegisterRequest(user.username(), user.password(), user.email());
         serverFacade.register(request);
-        Assertions.assertThrows(Exception.class, () -> serverFacade.register(request));
+        assertThrows(Exception.class, () -> serverFacade.register(request));
     }
 
     @Test
@@ -53,56 +54,152 @@ public class ServerFacadeTests {
         RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
         serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        assertDoesNotThrow(() -> serverFacade.login(loginRequest));
     }
 
     @Test
     public void loginNegative() throws Exception {
-
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        assertThrows(Exception.class, () -> serverFacade.login(loginRequest));
     }
 
     @Test
     public void logoutPositive() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
+        serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        serverFacade.setAuthToken(loginResult.authToken());
+
+        assertDoesNotThrow(() -> serverFacade.logout());
     }
 
     @Test
     public void logoutNegative() throws Exception {
-
+        serverFacade.setAuthToken("faketoken");
+        assertThrows(Exception.class, () -> serverFacade.logout());
     }
 
     @Test
     public void listGamesPositive() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
+        serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        serverFacade.setAuthToken(loginResult.authToken());
+
+        CreateGameRequest createGameRequest1 =
+                new CreateGameRequest(loginResult.authToken(), "gameName1");
+        CreateGameRequest createGameRequest2 =
+                new CreateGameRequest(loginResult.authToken(), "gameName2");
+        CreateGameRequest createGameRequest3 =
+                new CreateGameRequest(loginResult.authToken(), "gameName3");
+
+        serverFacade.createGame(createGameRequest1);
+        serverFacade.createGame(createGameRequest2);
+        serverFacade.createGame(createGameRequest3);
+
+        assertDoesNotThrow(() -> serverFacade.listGames());
     }
 
     @Test
     public void listGamesNegative() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
+        serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        serverFacade.setAuthToken(loginResult.authToken());
+
+        assertThrows(Exception.class, () -> serverFacade.listGames());
     }
 
     @Test
     public void createGamePositive() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
+        serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        serverFacade.setAuthToken(loginResult.authToken());
+
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "gameName1");
+
+        assertDoesNotThrow(() -> serverFacade.createGame(createGameRequest));
     }
 
     @Test
     public void createGameNegative() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
+        serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        serverFacade.setAuthToken(loginResult.authToken());
+
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "gameName1");
+        assertThrows(Exception.class, () -> serverFacade.createGame(createGameRequest));
     }
 
     @Test
     public void joinGamePositive() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
+        serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        serverFacade.setAuthToken(loginResult.authToken());
+
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "gameName1");
+        CreateGameResult createGameResult = serverFacade.createGame(createGameRequest);
+
+        JoinGameRequest joinGameRequest =
+                new JoinGameRequest(loginResult.authToken(), "WHITE", createGameResult.gameID());
+
+        assertDoesNotThrow(() -> serverFacade.joinGame(joinGameRequest));
     }
 
     @Test
     public void joinGameNegative() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
+        serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        serverFacade.setAuthToken(loginResult.authToken());
+
+        CreateGameRequest createGameRequest = new CreateGameRequest(loginResult.authToken(), "gameName1");
+        CreateGameResult createGameResult = serverFacade.createGame(createGameRequest);
+
+        JoinGameRequest joinGameRequest =
+                new JoinGameRequest("bad auth token", "WHITE", createGameResult.gameID());
+
+        assertThrows(Exception.class, () -> serverFacade.joinGame(joinGameRequest));
     }
 
     @Test
     public void clear() throws Exception {
+        RegisterRequest registerRequest = new RegisterRequest(user.username(), user.password(), user.email());
+        serverFacade.register(registerRequest);
 
+        LoginRequest loginRequest = new LoginRequest(user.username(), user.password());
+        LoginResult loginResult = serverFacade.login(loginRequest);
+        serverFacade.setAuthToken(loginResult.authToken());
+
+        CreateGameRequest createGameRequest1 =
+                new CreateGameRequest(loginResult.authToken(), "gameName1");
+        CreateGameRequest createGameRequest2 =
+                new CreateGameRequest(loginResult.authToken(), "gameName2");
+        CreateGameRequest createGameRequest3 =
+                new CreateGameRequest(loginResult.authToken(), "gameName3");
+
+        serverFacade.createGame(createGameRequest1);
+        serverFacade.createGame(createGameRequest2);
+        serverFacade.createGame(createGameRequest3);
+
+        assertDoesNotThrow(() -> serverFacade.clear());
     }
-
 }
