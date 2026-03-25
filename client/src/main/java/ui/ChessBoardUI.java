@@ -2,6 +2,8 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +27,7 @@ public class ChessBoardUI {
         out.println(ERASE_SCREEN);
 
         drawHorizontalBorder(out, isBlack);
-        drawRows(out, isBlack);
+        drawRows(out, game, isBlack);
         drawHorizontalBorder(out, isBlack);
     }
 
@@ -52,14 +54,24 @@ public class ChessBoardUI {
         out.println();
     }
 
-    public static void drawRows(PrintStream out, boolean isBlack) {
+    public static void drawRows(PrintStream out, ChessGame game, boolean isBlack) {
+        ChessBoard board = game.getBoard();
         if (!isBlack) {
-            for (int i = BOARD_SIZE_IN_SQUARES - 1; i >= 0; i--) {
+            for (int row = BOARD_SIZE_IN_SQUARES - 1; row >= 0; row--) {
                 out.print(SET_BG_COLOR_LIGHT_GREY);
                 out.print(SET_TEXT_COLOR_BLACK);
-                out.print(" " + ROW_LABELS[i] + " ");
+                out.print(" " + ROW_LABELS[row] + " ");
 
-                for
+                for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
+                    if ((row + col) % 2 == 0) {
+                        out.print(SET_BG_COLOR_WHITE);
+                        ChessPosition square = new ChessPosition(row, col);
+                        ChessPiece piece = board.getPiece(square);
+                    }
+                    else {
+                        out.print(SET_BG_COLOR_DARK_GREY);
+                    }
+                }
             }
         }
     }
