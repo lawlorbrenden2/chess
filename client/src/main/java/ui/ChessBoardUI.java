@@ -7,8 +7,10 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Random;
 
+import static chess.ChessPiece.PieceType.KING;
 import static ui.EscapeSequences.*;
 
 public class ChessBoardUI {
@@ -34,7 +36,6 @@ public class ChessBoardUI {
     private static void drawHorizontalBorder(PrintStream out, boolean isBlack) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
         out.print(SET_TEXT_COLOR_BLACK);
-
         out.print(EMPTY);
 
         if (!isBlack) {
@@ -65,17 +66,42 @@ public class ChessBoardUI {
                 for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
                     if ((row + col) % 2 == 0) {
                         out.print(SET_BG_COLOR_WHITE);
-                        ChessPosition square = new ChessPosition(row, col);
-                        ChessPiece piece = board.getPiece(square);
                     }
                     else {
                         out.print(SET_BG_COLOR_DARK_GREY);
                     }
+                    ChessPosition square = new ChessPosition(row, col);
+                    ChessPiece piece = board.getPiece(square);
+                    out.print(" " + getPieceString(piece) + " ");
                 }
+
             }
         }
+
+        out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print(EMPTY);
+
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
+        out.println();
     }
 
+    public static String getPieceString(ChessPiece piece) {
+        if (piece == null) {
+            return EMPTY;
+        }
+
+        boolean isBlack = piece.getTeamColor() == ChessGame.TeamColor.BLACK;
+
+        return switch (piece.getPieceType()) {
+            case KING -> isBlack ? BLACK_KING : WHITE_KING;
+            case QUEEN -> isBlack ? BLACK_QUEEN : WHITE_QUEEN;
+            case BISHOP -> isBlack ? BLACK_BISHOP : WHITE_BISHOP;
+            case KNIGHT -> isBlack ? BLACK_KNIGHT : WHITE_KNIGHT;
+            case ROOK -> isBlack ? BLACK_ROOK : WHITE_ROOK;
+            case PAWN -> isBlack ? BLACK_PAWN : WHITE_PAWN;
+        };
+    }
 
 }
 
