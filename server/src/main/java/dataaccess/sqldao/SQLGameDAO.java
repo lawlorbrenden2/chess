@@ -30,8 +30,13 @@ public class SQLGameDAO extends BaseSQLDAO implements GameDAO {
                 "INSERT INTO games (gameName, whiteUsername, blackUsername, json) VALUES (?, ?, ?, ?)";
         String json = new Gson().toJson(game.game());
 
-        return executeUpdate(statement, game.gameName(), game.whiteUsername(), game.blackUsername(), json);
-    }
+        int generatedID = executeUpdate(statement, game.gameName(), game.whiteUsername(), game.blackUsername(), json);
+
+        if (generatedID == 0) {
+            throw new DataAccessException("Failed to get generated game ID");
+        }
+
+        return generatedID;    }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {

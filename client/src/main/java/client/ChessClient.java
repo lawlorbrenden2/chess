@@ -17,7 +17,7 @@ public class ChessClient {
     private State state = State.LOGGEDOUT;
     private String username;
     private String teamColor;
-    private java.util.List<Integer> gameNumberMap = new java.util.ArrayList<>();
+    private java.util.List<Integer> gameIDMap = new java.util.ArrayList<>();
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
@@ -89,11 +89,16 @@ public class ChessClient {
 
     public String listGames() throws Exception {
         assertLoggedIn();
+        gameIDMap.clear();
         var result = server.listGames();
 
         var output = new StringBuilder();
+        int gameNumber = 1;
+
         for (var game : result.games()) {
-            output.append(game.gameID())
+            gameIDMap.add(game.gameID());
+
+            output.append(gameNumber)
                   .append(": ")
                   .append(game.gameName());
 
@@ -110,20 +115,39 @@ public class ChessClient {
                 output.append(" [Black: <available>]");
             }
             output.append("\n");
+            gameNumber++;
         }
+
+        if (gameIDMap.isEmpty()) {
+            throw new Exception("No games found. Add a game using 'create'");
+        }
+
         return output.toString();
     }
 
     public String joinGame(String... params) throws Exception {
         assertLoggedIn();
         if (params.length >= 2) {
-            int gameID;
+            int gameNumber;
 
             try {
-                gameID = Integer.parseInt(params[0]);
+                gameNumber = Integer.parseInt(params[0]);
             } catch (NumberFormatException e) {
                 throw new Exception("Game ID must be a number");
-            }            String colorInput = params[1].toUpperCase();
+            }
+
+            if (gameIDMap.isEmpty()) {
+                throw new Exception("No games loaded. Run 'list' first");
+            }
+
+            if (gameNumber < 1 || gameNumber > gameIDMap.size()) {
+                System.out.println(gameIDMap);
+                throw new Exception("Invalid game number. Run 'list' to see valid games.");
+            }
+
+            int gameID = gameIDMap.get(gameNumber - 1);
+
+            String colorInput = params[1].toUpperCase();
 
             if (!colorInput.equals("WHITE") && !colorInput.equals("BLACK")) {
                 throw new Exception("Color must be WHITE or BLACK");
@@ -134,15 +158,31 @@ public class ChessClient {
             var request = new JoinGameRequest(authToken, teamColor, gameID);
             server.joinGame(request);
 
-            return "Joined game with gameID: " +  " and color " + teamColor;
+            return "Joined game with gameID: " + gameNumber + " and color " + teamColor;
         }
 
-        throw new Exception("Expected: <gameID> <WHITE|BLACK>");
+        throw new Exception("Expected: <gameNumber> <WHITE|BLACK>");
     }
 
-    public String observeGame() throws Exception {
+    public String observeGame(String... params) throws Exception {
         assertLoggedIn();
-        return "";
+
+        if (params.length >= 1) {
+            int gameNumber;
+            try {
+                gameNumber = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                throw new Exception("Game ID must be a number");
+            }
+
+            if (gameNumber < 1 || gameNumber > gameIDMap.size()) {
+                throw new Exception("Invalid game number.");
+            }
+
+            return "Observing game " + gameNumber;
+        }
+
+        throw new Exception("Expected: <gameID>");
     }
 
     public String logout() throws Exception {
@@ -165,7 +205,7 @@ public class ChessClient {
             case "create" -> createGame(params);
             case "list" -> listGames();
             case "join" -> joinGame(params);
-            case "observe" -> observeGame();
+            case "observe" -> observeGame(params);
             case "logout" -> logout();
             case "quit" -> "quit";
             default -> help();
