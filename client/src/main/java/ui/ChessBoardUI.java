@@ -1,7 +1,6 @@
 package ui;
 
 import chess.ChessBoard;
-import chess.ChessPiece;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -17,7 +16,7 @@ public class ChessBoardUI {
     private static final String[] ROW_LABELS = {"1", "2", "3", "4", "5", "6", "7", "8"};
     private static final String[] COLUMN_LABELS = {"a", "b", "c", "d", "e", "f", "g", "h"};
 
-    public static void drawChessBoard(PrintStream out) {
+    public static void drawChessBoard(PrintStream out, ChessBoard board) {
         out.println(ERASE_SCREEN);
     }
 

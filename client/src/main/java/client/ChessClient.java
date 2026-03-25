@@ -3,7 +3,6 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 
-
 import model.request.CreateGameRequest;
 import model.request.JoinGameRequest;
 import model.request.LoginRequest;
@@ -17,6 +16,8 @@ public class ChessClient {
     private final ServerFacade server;
     private State state = State.LOGGEDOUT;
     private String username;
+    private String teamColor;
+    private java.util.List<Integer> gameNumberMap = new java.util.ArrayList<>();
 
     public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
@@ -116,12 +117,24 @@ public class ChessClient {
     public String joinGame(String... params) throws Exception {
         assertLoggedIn();
         if (params.length >= 2) {
-            int gameID = Integer.parseInt(params[0]);
-            String color = params[1].toUpperCase();
-            var request = new JoinGameRequest(authToken, color, gameID);
+            int gameID;
+
+            try {
+                gameID = Integer.parseInt(params[0]);
+            } catch (NumberFormatException e) {
+                throw new Exception("Game ID must be a number");
+            }            String colorInput = params[1].toUpperCase();
+
+            if (!colorInput.equals("WHITE") && !colorInput.equals("BLACK")) {
+                throw new Exception("Color must be WHITE or BLACK");
+            }
+
+            teamColor = colorInput;
+
+            var request = new JoinGameRequest(authToken, teamColor, gameID);
             server.joinGame(request);
 
-            return "Joined game with gameID: " + gameID;
+            return "Joined game with gameID: " +  " and color " + teamColor;
         }
 
         throw new Exception("Expected: <gameID> <WHITE|BLACK>");
