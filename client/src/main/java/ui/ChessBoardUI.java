@@ -7,17 +7,16 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Random;
 
-import static chess.ChessPiece.PieceType.KING;
 import static ui.EscapeSequences.*;
 
 public class ChessBoardUI {
     private static final int BOARD_SIZE_IN_SQUARES = 8;
-    private static final int BOARD_SIZE_PLUS_BORDER_IN_SQUARES = 10;
-    private static final int SQUARE_SIZE_IN_PADDED_CHARS = 3;
-    private static final int LINE_WIDTH_IN_PADDED_CHARS = 1;
+    private static final String LIGHT_SQUARE_COLOR = SET_BG_COLOR_WHITE;
+    private static final String DARK_SQUARE_COLOR = SET_BG_COLOR_LIGHT_GREY;
+    private static final String BORDER_COLOR = SET_BG_COLOR_DARK_GREY;
+    private static final String BORDER_TEXT_COLOR = SET_TEXT_COLOR_WHITE;
+    private static final String PIECE_TEXT_COLOR = SET_TEXT_COLOR_BLACK;
 
     private static final String[] ROW_LABELS = {"1", "2", "3", "4", "5", "6", "7", "8"};
     private static final String[] COLUMN_LABELS = {"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -34,8 +33,8 @@ public class ChessBoardUI {
     }
 
     private static void drawHorizontalBorder(PrintStream out, boolean isBlack) {
-        out.print(SET_BG_COLOR_LIGHT_GREY);
-        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(BORDER_COLOR);
+        out.print(BORDER_TEXT_COLOR);
         out.print(EMPTY);
 
         if (!isBlack) {
@@ -57,33 +56,41 @@ public class ChessBoardUI {
 
     public static void drawRows(PrintStream out, ChessGame game, boolean isBlack) {
         ChessBoard board = game.getBoard();
-        if (!isBlack) {
-            for (int row = BOARD_SIZE_IN_SQUARES - 1; row >= 0; row--) {
-                out.print(SET_BG_COLOR_LIGHT_GREY);
-                out.print(SET_TEXT_COLOR_BLACK);
-                out.print(" " + ROW_LABELS[row] + " ");
 
-                for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
-                    if ((row + col) % 2 == 0) {
-                        out.print(SET_BG_COLOR_WHITE);
-                    }
-                    else {
-                        out.print(SET_BG_COLOR_DARK_GREY);
-                    }
-                    ChessPosition square = new ChessPosition(row, col);
-                    ChessPiece piece = board.getPiece(square);
-                    out.print(" " + getPieceString(piece) + " ");
+        // set starting and ending rows and columns plus the direction we're moving through them
+        int startRow = isBlack ? 0 : BOARD_SIZE_IN_SQUARES - 1;
+        int endRow = isBlack ? BOARD_SIZE_IN_SQUARES - 1 : 0;
+        int rowDirection = isBlack ? 1 : -1;
+
+        int startCol = isBlack ? BOARD_SIZE_IN_SQUARES - 1 : 0;
+        int endCol = isBlack ? 0 : BOARD_SIZE_IN_SQUARES - 1;
+        int colDirection = isBlack ? -1 : 1;
+
+        for (int row = startRow; isBlack ? row <= endRow : row >= endRow; row += rowDirection) {
+            out.print(BORDER_COLOR);
+            out.print(BORDER_TEXT_COLOR);
+            out.print(" " + ROW_LABELS[row] + " ");
+
+            for (int col = startCol; isBlack ? col >= endCol : col <= endCol; col += colDirection) {
+                if ((row + col) % 2 == 0) {
+                    out.print(DARK_SQUARE_COLOR);
+                } else {
+                    out.print(LIGHT_SQUARE_COLOR);
                 }
-
+                ChessPosition square = new ChessPosition(row + 1, col + 1);
+                ChessPiece piece = board.getPiece(square);
+                out.print(PIECE_TEXT_COLOR);
+                out.print(getPieceString(piece));
             }
+
+            out.print(BORDER_COLOR);
+            out.print(BORDER_TEXT_COLOR);
+            out.print(" " + ROW_LABELS[row] + " ");
+
+            out.print(RESET_BG_COLOR);
+            out.print(RESET_TEXT_COLOR);
+            out.println();
         }
-
-        out.print(SET_BG_COLOR_LIGHT_GREY);
-        out.print(EMPTY);
-
-        out.print(RESET_BG_COLOR);
-        out.print(RESET_TEXT_COLOR);
-        out.println();
     }
 
     public static String getPieceString(ChessPiece piece) {
