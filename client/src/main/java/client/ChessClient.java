@@ -84,6 +84,8 @@ public class ChessClient {
             var request = new CreateGameRequest(authToken, params[0]);
             var result = server.createGame(request);
 
+            gameIDMap.add(result.gameID());
+
             return "Created game " + params[0] + " with game number: " + result.gameID();
         }
         throw new Exception("Expected: gameName");
@@ -123,7 +125,6 @@ public class ChessClient {
         if (gameIDMap.isEmpty()) {
             throw new Exception("No games found. Add a game using 'create'");
         }
-
         return output.toString();
     }
 
@@ -160,12 +161,12 @@ public class ChessClient {
             var request = new JoinGameRequest(authToken, teamColor, gameID);
             server.joinGame(request);
 
-            String message = "Joined game with gameID: " + gameNumber + " and color " + teamColor;
+            System.out.println("Joined game with gameID: " + gameNumber + " and color " + teamColor + "\n");
 
             ChessGame game = new ChessGame();
             ChessBoardUI.drawChessBoard(game, teamColor);
 
-            return message;
+            return "";
         }
 
         throw new Exception("Expected: <game number> <WHITE|BLACK>");
@@ -186,13 +187,12 @@ public class ChessClient {
                 throw new Exception("Invalid game number.");
             }
 
-            String message = "Joined game with gameID: " + gameNumber + " and color " + teamColor;
+            System.out.println("Observing game with gameID: " + gameNumber + " and color " + teamColor + "\n");
 
             ChessGame game = new ChessGame();
             ChessBoardUI.drawChessBoard(game, "WHITE"); // observers always observe from white pov
 
-            return message;
-
+            return "";
         }
 
         throw new Exception("Expected: <game number>");

@@ -128,7 +128,7 @@ public class ServerFacade {
     private String translateError(String message) {
         return switch (message.toLowerCase()) {
             case "unauthorized" -> "Invalid username or password.";
-            case "already taken" -> "Username already exists. Please choose another.";
+            case "already taken" -> "Username or team color already taken. Please choose another.";
             default -> message;
         };
     }
