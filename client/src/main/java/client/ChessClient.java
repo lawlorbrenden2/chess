@@ -79,10 +79,10 @@ public class ChessClient {
     public String createGame(String... params) throws Exception {
         assertLoggedIn();
         if (params.length >= 1) {
-            var request = new CreateGameRequest(params[0], authToken);
+            var request = new CreateGameRequest(authToken, params[0]);
             var result = server.createGame(request);
 
-            return "Created game with gameID: " + result.gameID();
+            return "Created game " + params[0] + " with game number: " + result.gameID();
         }
         throw new Exception("Expected: gameName");
     }
@@ -161,7 +161,7 @@ public class ChessClient {
             return "Joined game with gameID: " + gameNumber + " and color " + teamColor;
         }
 
-        throw new Exception("Expected: <gameNumber> <WHITE|BLACK>");
+        throw new Exception("Expected: <game number> <WHITE|BLACK>");
     }
 
     public String observeGame(String... params) throws Exception {
@@ -172,7 +172,7 @@ public class ChessClient {
             try {
                 gameNumber = Integer.parseInt(params[0]);
             } catch (NumberFormatException e) {
-                throw new Exception("Game ID must be a number");
+                throw new Exception("Game number must be a number");
             }
 
             if (gameNumber < 1 || gameNumber > gameIDMap.size()) {
@@ -182,7 +182,7 @@ public class ChessClient {
             return "Observing game " + gameNumber;
         }
 
-        throw new Exception("Expected: <gameID>");
+        throw new Exception("Expected: <game number>");
     }
 
     public String logout() throws Exception {
@@ -231,7 +231,7 @@ public class ChessClient {
 
     private void assertLoggedIn() throws Exception {
         if (state == State.LOGGEDOUT) {
-            throw new Exception("You must log in!");
+            throw new Exception("Please log in first");
         }
     }
 
