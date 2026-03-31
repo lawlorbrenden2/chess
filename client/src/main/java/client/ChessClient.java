@@ -121,7 +121,6 @@ public class ChessClient {
             output.append("\n");
             gameNumber++;
         }
-
         if (gameIDMap.isEmpty()) {
             throw new Exception("No games found. Add a game using 'create'");
         }
