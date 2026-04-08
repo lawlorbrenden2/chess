@@ -1,17 +1,17 @@
 package server.websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
+
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import io.javalin.Javalin;
 import io.javalin.websocket.WsContext;
 import model.data.AuthData;
 import model.data.GameData;
+
 import service.GameService;
-import service.UserService;
 import websocket.commands.*;
 import websocket.messages.*;
 
@@ -20,13 +20,12 @@ public class WebSocketHandler {
     private final Gson gson = new Gson();
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final AuthDAO authDAO;
-    private final GameDAO gameDAO;
+    private final GameService gameService;
 
-    public WebSocketHandler(UserService userService, AuthDAO authDAO, GameDAO gameDAO) {
+    public WebSocketHandler(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
         this.authDAO = authDAO;
-        this.gameDAO = gameDAO;
+        this.gameService = new GameService(userDAO, gameDAO, authDAO);
     }
-
 
     public void register(Javalin app) {
         app.ws("/ws", ws -> {
@@ -42,9 +41,9 @@ public class WebSocketHandler {
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(ctx, command);
-                case MAKE_MOVE -> makeMove(ctx, command);
-                case LEAVE -> leave(ctx, command);
-                case RESIGN -> resign(ctx, command);
+                case MAKE_MOVE -> makeMove(ctx, (MakeMoveCommand) command);
+                case LEAVE -> leave(ctx, (LeaveCommand) command);
+                case RESIGN -> resign(ctx, (ResignCommand) command);
                 default -> {
                     ctx.send(
                             gson.toJson(new ErrorMessage("Unknown command"))
@@ -68,30 +67,26 @@ public class WebSocketHandler {
 
         String username = authData.username();
         connectionManager.addConnection(ctx, username);
+        connectionManager.addToGame(ctx, command.getGameID());
         ctx.send(gson.toJson(new NotificationMessage("Connected!")));
     }
 
-    private void makeMove(WsContext ctx, MakeMoveCommand command) throws DataAccessException {
-        String authToken = command.getAuthToken();
-        AuthData authData = authDAO.getAuth(authToken);
-
-        if (authData == null) {
-            ctx.send(gson.toJson(new ErrorMessage("Error: unauthorized")));
-            return;
-        }
-
-        String username = authData.username();
-        ChessMove move = command.getChessMove();
-        int gameID = command.getGameID();
-
+    private void makeMove(WsContext ctx, MakeMoveCommand command) {
         try {
-            GameData gameData = gameDAO.getGame(gameID);
-            ChessGame chessGame = gameData.game();
-            ChessGame.TeamColor teamColor = chessGame.getBoard().getPiece(move.getStartPosition()).getTeamColor();
+            GameData updatedGame = gameService.makeMove(
+                    command.getAuthToken(),
+                    command.getGameID(),
+                    command.getChessMove()
+            );
 
+            connectionManager.broadcastToGame(
+                    command.getGameID(),
+                    gson.toJson(new LoadGameMessage(updatedGame.game()))
+            );
 
+        } catch (Exception e) {
+            ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
         }
-
     }
 
     private void leave(WsContext ctx, LeaveCommand command) {

@@ -1,6 +1,9 @@
 package service;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.InvalidMoveException;
 import dataaccess.*;
 import model.data.AuthData;
 import model.data.GameData;
@@ -13,15 +16,18 @@ import model.result.ListGamesResult;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
-
+import websocket.commands.MakeMoveCommand;
+import websocket.messages.ErrorMessage;
 
 public class GameService {
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
+    private final UserDAO userDAO;
 
-    public GameService(GameDAO gameDAO, AuthDAO authDAO) {
+    public GameService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
+        this.userDAO = userDAO;
     }
 
     public ListGamesResult listGames(ListGamesRequest request)
@@ -98,5 +104,57 @@ public class GameService {
         return new JoinGameResult();
     }
 
+    public GameData makeMove(String authToken, int gameID, ChessMove move)
+            throws UnauthorizedException, BadRequestException, DataAccessException, InvalidMoveException {
+
+        AuthData authData = authDAO.getAuth(authToken);
+
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        String username = authData.username();
+
+        GameData gameData = gameDAO.getGame(gameID);
+
+        if (gameData == null) {
+            throw new BadRequestException("Error: Bad request");
+        }
+        ChessGame game = gameData.game();
+        ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+
+        if (piece == null) {
+            throw new InvalidMoveException(
+                "Only ChatGPT can move pieces from a square that doesn't already have a piece"
+            );
+        }
+
+        ChessGame.TeamColor teamColor = piece.getTeamColor();
+        if (game.getTeamTurn() != teamColor) {
+            throw new InvalidMoveException("Not your turn");
+        }
+
+        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE &&
+                !username.equals(gameData.whiteUsername())) {
+            throw new InvalidMoveException("You think you're ChatGPT? You can't move your opponent's piece!");
+        }
+
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK &&
+                !username.equals(gameData.blackUsername())) {
+            throw new InvalidMoveException("You think you're ChatGPT? You can't move your opponent's piece!");
+        }
+        game.makeMove(move);
+
+        GameData updatedGame = new GameData(
+                gameData.gameID(),
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                game
+        );
+
+        gameDAO.updateGame(updatedGame);
+        return updatedGame;
+    }
 
 }

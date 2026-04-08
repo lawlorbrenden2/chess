@@ -24,7 +24,7 @@ public class GameServiceTest {
         gameDAO = new SQLGameDAO();
         AuthDAO authDAO = new SQLAuthDAO();
         UserService userService = new UserService(userDAO, authDAO);
-        gameService = new GameService(gameDAO, authDAO);
+        gameService = new GameService(userDAO, gameDAO, authDAO);
 
 
         userDAO.clear();

@@ -26,10 +26,10 @@ public class Server {
             GameDAO gameDAO = new SQLGameDAO();
 
             UserService userService = new UserService(userDAO, authDAO);
-            GameService gameService = new GameService(gameDAO, authDAO);
+            GameService gameService = new GameService(userDAO, gameDAO, authDAO);
             ClearService clearService = new ClearService(gameDAO, userDAO, authDAO);
 
-            WebSocketHandler webSocketHandler = new WebSocketHandler(userService, authDAO, gameDAO);
+            WebSocketHandler webSocketHandler = new WebSocketHandler(userDAO, gameDAO, authDAO);
             webSocketHandler.register(javalin);
 
 

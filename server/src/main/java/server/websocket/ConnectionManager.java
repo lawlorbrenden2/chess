@@ -13,27 +13,33 @@ import java.util.*;
 public class ConnectionManager {
 
     private final Map<WsContext, String> sessionToUser = new HashMap<>();
-    private final Map<String, WsContext> userToSession = new HashMap<>();
+    private final Map<String, Set<WsContext>> userToSessions = new HashMap<>();
     private final Map<Integer, Set<WsContext>> gameToSessions = new HashMap<>();
     private final Map<WsContext, Integer> sessionToGame = new HashMap<>();
 
     public void addConnection(WsContext ctx, String username) {
         sessionToUser.put(ctx, username);
-        userToSession.put(username, ctx);
+        userToSessions.computeIfAbsent(username, k -> new HashSet<>()).add(ctx);
     }
 
     public void removeConnection(WsContext ctx) {
-        sessionToUser.remove(ctx);
+        String username = sessionToUser.remove(ctx);
+        if (username != null) {
+            userToSessions.remove(username);
+        }
 
         Integer gameID = sessionToGame.remove(ctx);
         if (gameID != null) {
             Set<WsContext> sessions = gameToSessions.get(gameID);
             if (sessions != null) {
                 sessions.remove(ctx);
+
+                if (sessions.isEmpty()) {
+                    gameToSessions.remove(gameID);
+                }
             }
         }
     }
-
     public void addToGame(WsContext ctx, Integer gameID) {
         sessionToGame.put(ctx, gameID);
         gameToSessions.computeIfAbsent(gameID, k -> new HashSet<>()).add(ctx);
@@ -50,6 +56,14 @@ public class ConnectionManager {
     public void broadcastToGame(int gameId, String message) {
         for (WsContext ctx : getGameSessions(gameId)) {
             sendToSession(ctx, message);
+        }
+    }
+
+    public void broadcastToGameExceptSender(int gameId, WsContext exclude, String message) {
+        for (WsContext ctx : getGameSessions(gameId)) {
+            if (!ctx.equals(exclude)) {
+                sendToSession(ctx, message);
+            }
         }
     }
 }
