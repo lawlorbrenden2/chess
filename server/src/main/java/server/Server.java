@@ -6,7 +6,9 @@ import dataaccess.sqldao.SQLAuthDAO;
 import dataaccess.sqldao.SQLGameDAO;
 import dataaccess.sqldao.SQLUserDAO;
 import io.javalin.*;
+import jakarta.websocket.WebSocketContainer;
 import server.handlers.*;
+import server.websocket.WebSocketHandler;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -19,6 +21,8 @@ public class Server {
     public Server() {
         try {
             javalin = Javalin.create(config -> config.staticFiles.add("web"));
+            WebSocketHandler webSocketHandler = new WebSocketHandler();
+            webSocketHandler.register(javalin);
 
             UserDAO userDAO = new SQLUserDAO();
             AuthDAO authDAO = new SQLAuthDAO();

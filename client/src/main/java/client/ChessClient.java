@@ -10,18 +10,25 @@ import model.request.LoginRequest;
 import model.request.RegisterRequest;
 import server.ServerFacade;
 import ui.ChessBoardUI;
+import websocket.NotificationHandler;
+import websocket.WebSocketFacade;
+import websocket.commands.ConnectCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.NotificationMessage;
 
 import static ui.EscapeSequences.*;
 
-public class ChessClient {
+public class ChessClient implements NotificationHandler {
     private String authToken = null;
     private final ServerFacade server;
     private State state = State.LOGGEDOUT;
     private String username;
     private String teamColor;
     private final java.util.List<Integer> gameIDMap = new java.util.ArrayList<>();
+    private WebSocketFacade ws;
 
-    public ChessClient(String serverURL) {
+
+    public ChessClient(String serverURL) throws Exception {
         server = new ServerFacade(serverURL);
     }
 
@@ -59,6 +66,9 @@ public class ChessClient {
             state = State.LOGGEDIN;
             username = params[0];
 
+            ws = new WebSocketFacade(this);
+            ws.connect("ws://localhost:8080/ws");
+
             return "Registered as " + username;
         }
         throw new Exception("Expected: <username> <password> <email>");
@@ -72,6 +82,9 @@ public class ChessClient {
             server.setAuthToken(authToken);
             state = State.LOGGEDIN;
             username = params[0];
+
+            ws = new WebSocketFacade(this);
+            ws.connect("ws://localhost:8080/ws");
 
             return "Logged in as " + username;
         }
@@ -156,11 +169,10 @@ public class ChessClient {
             teamColor = colorInput;
             var request = new JoinGameRequest(authToken, teamColor, gameID);
             server.joinGame(request);
+            Thread.sleep(200);
+            ws.sendCommand(new ConnectCommand(authToken, gameID));
 
             System.out.println("Joined game with gameID: " + gameNumber + " and color " + teamColor + "\n");
-
-            ChessGame game = new ChessGame();
-            ChessBoardUI.drawChessBoard(game, teamColor);
 
             return "";
         }
@@ -185,8 +197,10 @@ public class ChessClient {
 
             System.out.println("Observing game with gameID: " + gameNumber + " and color " + teamColor + "\n");
 
-            ChessGame game = new ChessGame();
-            ChessBoardUI.drawChessBoard(game, "WHITE"); // observers always observe from white pov
+            int gameID = gameIDMap.get(gameNumber - 1);
+            Thread.sleep(200);
+            ws.sendCommand(new ConnectCommand(authToken, gameID));
+
 
             return "";
         }
@@ -238,10 +252,28 @@ public class ChessClient {
                 SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
     }
 
+    @Override
+    public void notifyMessage(NotificationMessage notificationMessage) {
+        System.out.println("\n" + notificationMessage.getMessage());
+        printPrompt();
+    }
+
+    @Override
+    public void notifyError(ErrorMessage errorMessage) {
+        System.out.println("\nERROR: " + errorMessage.getError());
+        printPrompt();
+    }
+
+    @Override
+    public void loadGame(ChessGame game) {
+        System.out.println("\nGame updated:");
+        ChessBoardUI.drawChessBoard(game, teamColor != null ? teamColor : "WHITE");
+        printPrompt();
+    }
+
     private void assertLoggedIn() throws Exception {
         if (state == State.LOGGEDOUT) {
             throw new Exception("Please log in first");
         }
     }
-
 }
