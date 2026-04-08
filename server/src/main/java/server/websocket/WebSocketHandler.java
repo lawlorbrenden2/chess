@@ -2,13 +2,13 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import io.javalin.Javalin;
 import io.javalin.websocket.WsContext;
 import model.data.AuthData;
 import service.UserService;
-import websocket.commands.UserGameCommand;
-import websocket.messages.ErrorMessage;
-import websocket.messages.NotificationMessage;
+import websocket.commands.*;
+import websocket.messages.*;
 
 public class WebSocketHandler {
 
@@ -34,19 +34,10 @@ public class WebSocketHandler {
                     gson.fromJson(message, UserGameCommand.class);
 
             switch (command.getCommandType()) {
-                case CONNECT -> {
-                    String authToken = command.getAuthToken();
-                    AuthData auth = authDAO.getAuth(authToken);
-
-                    if (auth == null) {
-                        ctx.send(gson.toJson(new ErrorMessage("Unauthorized")));
-                        return;
-                    }
-
-                    String username = auth.username();
-                    connectionManager.addConnection(ctx, username);
-                    ctx.send(gson.toJson(new NotificationMessage("Connected!")));
-                }
+                case CONNECT -> connect(ctx, command);
+                case MAKE_MOVE -> makeMove(ctx, command);
+                case LEAVE -> leave(ctx, command);
+                case RESIGN -> resign(ctx, command);
                 default -> {
                     ctx.send(
                             gson.toJson(new ErrorMessage("Unknown command"))
@@ -58,4 +49,32 @@ public class WebSocketHandler {
             e.printStackTrace();
         }
     }
+
+    private void connect(WsContext ctx, UserGameCommand command) throws DataAccessException {
+
+        String authToken = command.getAuthToken();
+        AuthData auth = authDAO.getAuth(authToken);
+
+        if (auth == null) {
+            ctx.send(gson.toJson(new ErrorMessage("Unauthorized")));
+            return;
+        }
+
+        String username = auth.username();
+        connectionManager.addConnection(ctx, username);
+        ctx.send(gson.toJson(new NotificationMessage("Connected!")));
+    }
+
+    private void makeMove(WsContext ctx, MakeMoveCommand command) {
+
+    }
+
+    private void leave(WsContext ctx, LeaveCommand command) {
+
+    }
+
+    private void resign(WsContext ctx, ResignCommand command) {
+
+    }
+
 }
