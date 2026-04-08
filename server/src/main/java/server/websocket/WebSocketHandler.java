@@ -1,11 +1,16 @@
 package server.websocket;
 
+import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import io.javalin.Javalin;
 import io.javalin.websocket.WsContext;
 import model.data.AuthData;
+import model.data.GameData;
+import service.GameService;
 import service.UserService;
 import websocket.commands.*;
 import websocket.messages.*;
@@ -15,9 +20,11 @@ public class WebSocketHandler {
     private final Gson gson = new Gson();
     private final ConnectionManager connectionManager = new ConnectionManager();
     private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
 
-    public WebSocketHandler(UserService userService, AuthDAO authDAO) {
+    public WebSocketHandler(UserService userService, AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
     }
 
 
@@ -51,21 +58,39 @@ public class WebSocketHandler {
     }
 
     private void connect(WsContext ctx, UserGameCommand command) throws DataAccessException {
-
         String authToken = command.getAuthToken();
-        AuthData auth = authDAO.getAuth(authToken);
+        AuthData authData = authDAO.getAuth(authToken);
 
-        if (auth == null) {
+        if (authData == null) {
             ctx.send(gson.toJson(new ErrorMessage("Unauthorized")));
             return;
         }
 
-        String username = auth.username();
+        String username = authData.username();
         connectionManager.addConnection(ctx, username);
         ctx.send(gson.toJson(new NotificationMessage("Connected!")));
     }
 
-    private void makeMove(WsContext ctx, MakeMoveCommand command) {
+    private void makeMove(WsContext ctx, MakeMoveCommand command) throws DataAccessException {
+        String authToken = command.getAuthToken();
+        AuthData authData = authDAO.getAuth(authToken);
+
+        if (authData == null) {
+            ctx.send(gson.toJson(new ErrorMessage("Error: unauthorized")));
+            return;
+        }
+
+        String username = authData.username();
+        ChessMove move = command.getChessMove();
+        int gameID = command.getGameID();
+
+        try {
+            GameData gameData = gameDAO.getGame(gameID);
+            ChessGame chessGame = gameData.game();
+            ChessGame.TeamColor teamColor = chessGame.getBoard().getPiece(move.getStartPosition()).getTeamColor();
+
+
+        }
 
     }
 
