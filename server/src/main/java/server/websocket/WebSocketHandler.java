@@ -1,33 +1,41 @@
 package server.websocket;
 
-import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
-import websocket.commands.*;
 import com.google.gson.Gson;
 import io.javalin.Javalin;
+import io.javalin.websocket.WsContext;
+import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.NotificationMessage;
 
 public class WebSocketHandler {
 
-    Gson gson = new Gson();
+    private final Gson gson = new Gson();
 
-    @OnWebSocketMessage
-    public void onMessage(Session session, String message) {
+    public void register(Javalin app) {
+
+        app.ws("/ws", ws -> {
+            ws.onMessage(ctx -> handleMessage(ctx, ctx.message()));
+        });
+    }
+
+    private void handleMessage(WsContext ctx, String message) {
         try {
-            UserGameCommand command = gson.fromJson(message,UserGameCommand.class);
-                switch (command.getCommandType()) {
-                    case CONNECT -> {
-                        session.getRemote().sendString(
-                                gson.toJson(new NotificationMessage("Connected!"))
-                        );
-                    }
-                    default -> {
-                        session.getRemote().sendString(
-                                gson.toJson(new ErrorMessage("Unknown command"))
-                        );
-                    }
+            UserGameCommand command =
+                    gson.fromJson(message, UserGameCommand.class);
+
+            switch (command.getCommandType()) {
+                case CONNECT -> {
+                    ctx.send(
+                            gson.toJson(new NotificationMessage("Connected!"))
+                    );
                 }
+                default -> {
+                    ctx.send(
+                            gson.toJson(new ErrorMessage("Unknown command"))
+                    );
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
