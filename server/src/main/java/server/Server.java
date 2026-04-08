@@ -21,9 +21,6 @@ public class Server {
     public Server() {
         try {
             javalin = Javalin.create(config -> config.staticFiles.add("web"));
-            WebSocketHandler webSocketHandler = new WebSocketHandler();
-            webSocketHandler.register(javalin);
-
             UserDAO userDAO = new SQLUserDAO();
             AuthDAO authDAO = new SQLAuthDAO();
             GameDAO gameDAO = new SQLGameDAO();
@@ -31,6 +28,10 @@ public class Server {
             UserService userService = new UserService(userDAO, authDAO);
             GameService gameService = new GameService(gameDAO, authDAO);
             ClearService clearService = new ClearService(gameDAO, userDAO, authDAO);
+
+            WebSocketHandler webSocketHandler = new WebSocketHandler(userService, authDAO);
+            webSocketHandler.register(javalin);
+
 
             RegisterHandler registerHandler = new RegisterHandler(userService);
             javalin.post("/user", registerHandler);
