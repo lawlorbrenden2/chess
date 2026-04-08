@@ -7,6 +7,7 @@ import chess.InvalidMoveException;
 import dataaccess.*;
 import model.data.AuthData;
 import model.data.GameData;
+import model.data.UserData;
 import model.request.CreateGameRequest;
 import model.request.JoinGameRequest;
 import model.request.ListGamesRequest;
@@ -104,17 +105,16 @@ public class GameService {
         return new JoinGameResult();
     }
 
+
     public GameData makeMove(String authToken, int gameID, ChessMove move)
             throws UnauthorizedException, BadRequestException, DataAccessException, InvalidMoveException {
 
         AuthData authData = authDAO.getAuth(authToken);
-
         if (authData == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
 
         String username = authData.username();
-
         GameData gameData = gameDAO.getGame(gameID);
 
         if (gameData == null) {
@@ -157,4 +157,29 @@ public class GameService {
         return updatedGame;
     }
 
+    public void leave(String authToken, int gameID, boolean isPlayer)
+        throws UnauthorizedException, BadRequestException, DataAccessException, InvalidMoveException {
+
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        String username = authData.username();
+        UserData userData = userDAO.getUser(username);
+        GameData gameData = gameDAO.getGame(gameID);
+
+        if (gameData == null) {
+            throw new BadRequestException("Error: Bad request");
+        }
+        ChessGame game = gameData.game();
+
+        if (isPlayer) {
+
+        }
+    }
+
+    public void resign() {
+
+    }
 }
