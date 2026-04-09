@@ -281,7 +281,6 @@ public class ChessClient implements NotificationHandler {
             state = State.GAMEPLAY;
             currentGameID = gameID;
 
-
             ws = new WebSocketFacade(this);
             ws.connect("ws://localhost:8080/ws");
             Thread.sleep(200);

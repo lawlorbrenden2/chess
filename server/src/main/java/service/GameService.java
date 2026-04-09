@@ -17,8 +17,6 @@ import model.result.ListGamesResult;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
-import websocket.commands.MakeMoveCommand;
-import websocket.messages.ErrorMessage;
 
 public class GameService {
     private final GameDAO gameDAO;
@@ -84,24 +82,23 @@ public class GameService {
 
         switch(request.playerColor().toUpperCase()) {
             case "WHITE" -> {
-                if (game.whiteUsername() != null) {
+                if (game.whiteUsername() != null && !game.whiteUsername().equals(auth.username())) {
                     throw new AlreadyTakenException("Error: Already taken");
                 }
                 updatedGame = new GameData(game.gameID(), auth.username(), game.blackUsername(),
-                                    game.gameName(), game.game());
+                        game.gameName(), game.game());
             }
             case "BLACK" -> {
-                if (game.blackUsername() != null) {
+                if (game.blackUsername() != null && !game.blackUsername().equals(auth.username())) {
                     throw new AlreadyTakenException("Error: Already taken");
                 }
                 updatedGame = new GameData(game.gameID(), game.whiteUsername(), auth.username(),
-                                    game.gameName(), game.game());
+                        game.gameName(), game.game());
             }
             default -> throw new BadRequestException("Error: Bad request");
         }
 
         gameDAO.updateGame(updatedGame);
-
         return new JoinGameResult();
     }
 
