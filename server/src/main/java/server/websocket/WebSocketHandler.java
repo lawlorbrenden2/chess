@@ -90,11 +90,51 @@ public class WebSocketHandler {
     }
 
     private void leave(WsContext ctx, LeaveCommand command) {
+        try {
+            String authToken = command.getAuthToken();
+            AuthData authData = authDAO.getAuth(authToken);
 
+            if (authData == null) {
+                ctx.send(gson.toJson(new ErrorMessage("Unauthorized")));
+                return;
+            }
+
+            String username = authData.username();
+            gameService.leave(authToken, command.getGameID());
+            connectionManager.removeConnection(ctx);
+            connectionManager.broadcastToGameExceptSender(
+                    command.getGameID(),
+                    ctx,
+                    gson.toJson(new NotificationMessage(username + " left the game!"))
+                    );
+
+        } catch (Exception e) {
+            ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
+        }
     }
 
     private void resign(WsContext ctx, ResignCommand command) {
+        try {
+            String authToken = command.getAuthToken();
+            AuthData authData = authDAO.getAuth(authToken);
 
+            if (authData == null) {
+                ctx.send(gson.toJson(new ErrorMessage("Unauthorized")));
+                return;
+            }
+
+            String username = authData.username();
+            gameService.resign(authToken, command.getGameID());
+            connectionManager.removeConnection(ctx);
+            connectionManager.broadcastToGameExceptSender(
+                    command.getGameID(),
+                    ctx,
+                    gson.toJson(new NotificationMessage(username + " resigned!"))
+            );
+
+        } catch (Exception e) {
+            ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
+        }
     }
 
 }

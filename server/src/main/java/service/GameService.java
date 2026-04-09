@@ -157,7 +157,7 @@ public class GameService {
         return updatedGame;
     }
 
-    public void leave(String authToken, int gameID, boolean isPlayer)
+    public void leave(String authToken, int gameID)
         throws UnauthorizedException, BadRequestException, DataAccessException, InvalidMoveException {
 
         AuthData authData = authDAO.getAuth(authToken);
@@ -172,11 +172,23 @@ public class GameService {
         if (gameData == null) {
             throw new BadRequestException("Error: Bad request");
         }
-        ChessGame game = gameData.game();
 
-        if (isPlayer) {
+        boolean isWhite = username.equals(gameData.whiteUsername());
+        boolean isBlack = username.equals(gameData.blackUsername());
 
+        if (isWhite || isBlack) {
+            GameData updatedGame = new GameData(
+                    gameData.gameID(),
+                    isWhite ? null : gameData.whiteUsername(),
+                    isBlack ? null : gameData.blackUsername(),
+                    gameData.gameName(),
+                    gameData.game()
+
+            );
+            gameDAO.updateGame(updatedGame);
         }
+
+
     }
 
     public void resign() {
