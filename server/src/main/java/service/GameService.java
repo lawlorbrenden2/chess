@@ -143,6 +143,10 @@ public class GameService {
                 !username.equals(gameData.blackUsername())) {
             throw new InvalidMoveException("You think you're ChatGPT? You can't move your opponent's piece!");
         }
+
+        if (game.isGameOver()) {
+            throw new InvalidMoveException("Game is over");
+        }
         game.makeMove(move);
 
         GameData updatedGame = new GameData(
@@ -190,8 +194,8 @@ public class GameService {
 
     }
 
-    public void resign (String authToken, int gameID)
-            throws UnauthorizedException, BadRequestException, DataAccessException {
+    public GameData resign (String authToken, int gameID)
+            throws Exception {
 
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
@@ -205,7 +209,22 @@ public class GameService {
             throw new BadRequestException("Error: Bad request");
         }
 
-        boolean isWhite = username.equals(gameData.whiteUsername());
-        boolean isBlack = username.equals(gameData.blackUsername());
+        ChessGame game = gameData.game();
+        if (game.isGameOver()) {
+            throw new Exception("Game already over");
+        }
+
+        game.setGameOver(true);
+
+        gameDAO.updateGame(new GameData(
+                gameData.gameID(),
+                gameData.whiteUsername(),
+                gameData.blackUsername(),
+                gameData.gameName(),
+                game
+        ));
+
+        return gameData;
+
     }
 }

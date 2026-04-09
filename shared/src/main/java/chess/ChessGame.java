@@ -20,6 +20,7 @@ public class ChessGame {
     private boolean blackKingsideRookMoved;
     private boolean whiteQueensideRookMoved;
     private boolean blackQueensideRookMoved;
+    private boolean gameOver = false;
 
 
     public ChessGame() {
@@ -56,6 +57,14 @@ public class ChessGame {
     public enum TeamColor {
         WHITE,
         BLACK
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
     }
 
     /**

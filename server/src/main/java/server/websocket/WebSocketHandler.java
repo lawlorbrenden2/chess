@@ -124,12 +124,17 @@ public class WebSocketHandler {
             }
 
             String username = authData.username();
-            gameService.resign(authToken, command.getGameID());
+            GameData updatedGame = gameService.resign(authToken, command.getGameID());
             connectionManager.removeConnection(ctx);
             connectionManager.broadcastToGameExceptSender(
                     command.getGameID(),
                     ctx,
                     gson.toJson(new NotificationMessage(username + " resigned!"))
+            );
+
+            connectionManager.broadcastToGame(
+                    command.getGameID(),
+                    gson.toJson(new LoadGameMessage(updatedGame.game()))
             );
 
         } catch (Exception e) {

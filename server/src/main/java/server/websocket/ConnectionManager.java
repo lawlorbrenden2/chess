@@ -40,6 +40,7 @@ public class ConnectionManager {
             }
         }
     }
+
     public void addToGame(WsContext ctx, Integer gameID) {
         sessionToGame.put(ctx, gameID);
         gameToSessions.computeIfAbsent(gameID, k -> new HashSet<>()).add(ctx);

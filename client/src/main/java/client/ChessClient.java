@@ -12,9 +12,8 @@ import server.ServerFacade;
 import ui.ChessBoardUI;
 import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
-import websocket.commands.ConnectCommand;
-import websocket.messages.ErrorMessage;
-import websocket.messages.NotificationMessage;
+import websocket.commands.*;
+import websocket.messages.*;
 
 import static ui.EscapeSequences.*;
 
@@ -26,6 +25,8 @@ public class ChessClient implements NotificationHandler {
     private String teamColor;
     private final java.util.List<Integer> gameIDMap = new java.util.ArrayList<>();
     private WebSocketFacade ws;
+    private Integer currentGameID;
+    private ChessGame currentGame;
 
 
     public ChessClient(String serverURL) throws Exception {
@@ -103,7 +104,7 @@ public class ChessClient implements NotificationHandler {
         };
     }
 
-    private String getGameplayInput(String[] params, String cmd) {
+    private String getGameplayInput(String[] params, String cmd) throws Exception {
         return switch (cmd) {
             case "redraw" -> redrawBoard(params);
             case "leave" -> leave(params);
@@ -114,7 +115,7 @@ public class ChessClient implements NotificationHandler {
         };
     }
 
-    private String getObserverInput(String[] params, String cmd) {
+    private String getObserverInput(String[] params, String cmd) throws Exception {
         return switch (cmd) {
             case "redraw" -> redrawBoard(params);
             case "leave" -> leave(params);
@@ -180,9 +181,6 @@ public class ChessClient implements NotificationHandler {
             state = State.LOGGEDIN;
             username = params[0];
 
-            ws = new WebSocketFacade(this);
-            ws.connect("ws://localhost:8080/ws");
-
             return "Registered as " + username;
         }
         throw new Exception("Expected: <username> <password> <email>");
@@ -196,9 +194,6 @@ public class ChessClient implements NotificationHandler {
             server.setAuthToken(authToken);
             state = State.LOGGEDIN;
             username = params[0];
-
-            ws = new WebSocketFacade(this);
-            ws.connect("ws://localhost:8080/ws");
 
             return "Logged in as " + username;
         }
@@ -284,6 +279,11 @@ public class ChessClient implements NotificationHandler {
             var request = new JoinGameRequest(authToken, teamColor, gameID);
             server.joinGame(request);
             state = State.GAMEPLAY;
+            currentGameID = gameID;
+
+
+            ws = new WebSocketFacade(this);
+            ws.connect("ws://localhost:8080/ws");
             Thread.sleep(200);
             ws.sendCommand(new ConnectCommand(authToken, gameID));
 
@@ -311,13 +311,16 @@ public class ChessClient implements NotificationHandler {
             }
 
             state = State.OBSERVER;
-
             System.out.println("Observing game with gameID: " + gameNumber + " and color " + teamColor + "\n");
 
             int gameID = gameIDMap.get(gameNumber - 1);
+            currentGameID = gameID;
+
+
+            ws = new WebSocketFacade(this);
+            ws.connect("ws://localhost:8080/ws");
             Thread.sleep(200);
             ws.sendCommand(new ConnectCommand(authToken, gameID));
-
 
             return "";
         }
@@ -339,16 +342,33 @@ public class ChessClient implements NotificationHandler {
     }
 
     public String leave(String[] params) {
-        return "";
+        ws.sendCommand(new LeaveCommand(authToken, currentGameID));
+        state = State.LOGGEDIN;
+        int oldGameID = currentGameID;
+        currentGame = null;
+        currentGameID = null;
+        return SET_TEXT_COLOR_BLUE + "Left game " + oldGameID;
     }
 
     public String makeMove(String[] params) {
         return "";
     }
 
-    public String resign(String[] params) {
-        return "";
-    }
+    public String resign(String[] params) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print(SET_TEXT_COLOR_RED + "Are you sure you want to resign? (yes/no): ");
+        String response = scanner.nextLine().trim().toLowerCase();
+
+        if (!response.equals("yes") && (!response.equals("y"))) {
+            return SET_TEXT_COLOR_BLUE + "Resignation cancelled";
+        }
+        ws.sendCommand(new ResignCommand(authToken, currentGameID));
+        state = State.LOGGEDIN;
+        int oldGameID = currentGameID;
+        currentGame = null;
+        currentGameID = null;
+        return SET_TEXT_COLOR_BLUE + "Resigned from game " + oldGameID;
+}
 
     public String highlightLegalMoves(String[] params) {
         return "";
@@ -368,6 +388,7 @@ public class ChessClient implements NotificationHandler {
 
     @Override
     public void loadGame(ChessGame game) {
+        this.currentGame = game;
         System.out.println("\nGame updated:");
         ChessBoardUI.drawChessBoard(game, teamColor != null ? teamColor : "WHITE");
         printPrompt();
