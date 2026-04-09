@@ -158,7 +158,7 @@ public class GameService {
     }
 
     public void leave(String authToken, int gameID)
-        throws UnauthorizedException, BadRequestException, DataAccessException, InvalidMoveException {
+        throws UnauthorizedException, BadRequestException, DataAccessException {
 
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
@@ -166,7 +166,6 @@ public class GameService {
         }
 
         String username = authData.username();
-        UserData userData = userDAO.getUser(username);
         GameData gameData = gameDAO.getGame(gameID);
 
         if (gameData == null) {
@@ -191,7 +190,8 @@ public class GameService {
 
     }
 
-    public void resign() {
+    public void resign (String authToken, int gameID)
+            throws UnauthorizedException, BadRequestException, DataAccessException {
 
     }
 }
