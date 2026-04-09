@@ -158,7 +158,7 @@ public class ChessClient implements NotificationHandler {
                     SET_TEXT_COLOR_MAGENTA + " - leave game\n" +
                     SET_TEXT_COLOR_BLUE + "resign" +
                     SET_TEXT_COLOR_MAGENTA + " - resign game\n" +
-                    SET_TEXT_COLOR_BLUE + "highlight <pos>" +
+                    SET_TEXT_COLOR_BLUE + "highlight <SQUARE>" +
                     SET_TEXT_COLOR_MAGENTA + " - show legal moves\n";
 
             case OBSERVER ->
@@ -166,7 +166,7 @@ public class ChessClient implements NotificationHandler {
                     SET_TEXT_COLOR_MAGENTA + " - redraw board\n" +
                     SET_TEXT_COLOR_BLUE + "leave" +
                     SET_TEXT_COLOR_MAGENTA + " - leave game\n" +
-                    SET_TEXT_COLOR_BLUE + "highlight <pos>" +
+                    SET_TEXT_COLOR_BLUE + "highlight <SQUARE>" +
                     SET_TEXT_COLOR_MAGENTA + " - show legal moves\n";
         };
     }
