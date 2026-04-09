@@ -67,7 +67,7 @@ public class ChessClient implements NotificationHandler {
             case LOGGEDIN -> getLoggedInInput(params, cmd);
             case GAMEPLAY -> getGameplayInput(params, cmd);
             case OBSERVER -> getObserverInput(params, cmd);
-        }
+        };
 
 //        return switch (cmd) {
 //            case "register" -> register(params);
@@ -104,28 +104,71 @@ public class ChessClient implements NotificationHandler {
     }
 
     private String getGameplayInput(String[] params, String cmd) {
-
+        return switch (cmd) {
+            case "redraw" -> redrawBoard(params);
+            case "leave" -> leave(params);
+            case "move" -> makeMove(params);
+            case "resign" -> resign(params);
+            case "highlight" -> highlightLegalMoves(params);
+            default -> help();
+        };
     }
 
     private String getObserverInput(String[] params, String cmd) {
-
+        return switch (cmd) {
+            case "redraw" -> redrawBoard(params);
+            case "leave" -> leave(params);
+            case "highlight" -> highlightLegalMoves(params);
+            default -> help();
+        };
     }
 
     public String help() {
-        if (state == State.LOGGEDOUT) {
-            return SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" +
+        return switch (state) {
+            case LOGGEDOUT ->
+                    SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" +
                     SET_TEXT_COLOR_MAGENTA + " - to create an account\n" +
-                    SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>" + SET_TEXT_COLOR_MAGENTA + " - to play chess\n" +
-                    SET_TEXT_COLOR_BLUE + "quit" + SET_TEXT_COLOR_MAGENTA + " - playing chess\n" +
-                    SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
-        }
-        return SET_TEXT_COLOR_BLUE + "create <NAME>" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
-                SET_TEXT_COLOR_BLUE + "list" + SET_TEXT_COLOR_MAGENTA + " - games\n" +
-                SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
-                SET_TEXT_COLOR_BLUE + "observe <ID>" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
-                SET_TEXT_COLOR_BLUE + "logout" + SET_TEXT_COLOR_MAGENTA + " - when you are done\n" +
-                SET_TEXT_COLOR_BLUE + "quit" + SET_TEXT_COLOR_MAGENTA + " - playing chess\n" +
-                SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
+                    SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>" +
+                    SET_TEXT_COLOR_MAGENTA + " - to play chess\n" +
+                    SET_TEXT_COLOR_BLUE + "quit" +
+                    SET_TEXT_COLOR_MAGENTA + " - exit\n" +
+                    SET_TEXT_COLOR_BLUE + "help" +
+                    SET_TEXT_COLOR_MAGENTA + " - show commands\n";
+
+            case LOGGEDIN ->
+                    SET_TEXT_COLOR_BLUE + "create <NAME>" +
+                    SET_TEXT_COLOR_MAGENTA + " - create a game\n" +
+                    SET_TEXT_COLOR_BLUE + "list" +
+                    SET_TEXT_COLOR_MAGENTA + " - list games\n" +
+                    SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]" +
+                    SET_TEXT_COLOR_MAGENTA + " - join a game\n" +
+                    SET_TEXT_COLOR_BLUE + "observe <ID>" +
+                    SET_TEXT_COLOR_MAGENTA + " - observe a game\n" +
+                    SET_TEXT_COLOR_BLUE + "logout" +
+                    SET_TEXT_COLOR_MAGENTA + " - logout\n" +
+                    SET_TEXT_COLOR_BLUE + "quit" +
+                    SET_TEXT_COLOR_MAGENTA + " - exit\n";
+
+            case GAMEPLAY ->
+                    SET_TEXT_COLOR_BLUE + "redraw" +
+                    SET_TEXT_COLOR_MAGENTA + " - redraw board\n" +
+                    SET_TEXT_COLOR_BLUE + "move <from> <to>" +
+                    SET_TEXT_COLOR_MAGENTA + " - make a move\n" +
+                    SET_TEXT_COLOR_BLUE + "leave" +
+                    SET_TEXT_COLOR_MAGENTA + " - leave game\n" +
+                    SET_TEXT_COLOR_BLUE + "resign" +
+                    SET_TEXT_COLOR_MAGENTA + " - resign game\n" +
+                    SET_TEXT_COLOR_BLUE + "highlight <pos>" +
+                    SET_TEXT_COLOR_MAGENTA + " - show legal moves\n";
+
+            case OBSERVER ->
+                    SET_TEXT_COLOR_BLUE + "redraw" +
+                    SET_TEXT_COLOR_MAGENTA + " - redraw board\n" +
+                    SET_TEXT_COLOR_BLUE + "leave" +
+                    SET_TEXT_COLOR_MAGENTA + " - leave game\n" +
+                    SET_TEXT_COLOR_BLUE + "highlight <pos>" +
+                    SET_TEXT_COLOR_MAGENTA + " - show legal moves\n";
+        };
     }
 
     public String register(String... params) throws Exception {
@@ -240,6 +283,7 @@ public class ChessClient implements NotificationHandler {
             teamColor = colorInput;
             var request = new JoinGameRequest(authToken, teamColor, gameID);
             server.joinGame(request);
+            state = State.GAMEPLAY;
             Thread.sleep(200);
             ws.sendCommand(new ConnectCommand(authToken, gameID));
 
@@ -266,6 +310,8 @@ public class ChessClient implements NotificationHandler {
                 throw new Exception("Invalid game number.");
             }
 
+            state = State.OBSERVER;
+
             System.out.println("Observing game with gameID: " + gameNumber + " and color " + teamColor + "\n");
 
             int gameID = gameIDMap.get(gameNumber - 1);
@@ -289,23 +335,23 @@ public class ChessClient implements NotificationHandler {
     }
 
     public String redrawBoard(String[] params) {
-
+        return "";
     }
 
     public String leave(String[] params) {
-
+        return "";
     }
 
     public String makeMove(String[] params) {
-
+        return "";
     }
 
     public String resign(String[] params) {
-
+        return "";
     }
 
     public String highlightLegalMoves(String[] params) {
-
+        return "";
     }
 
     @Override
@@ -332,4 +378,5 @@ public class ChessClient implements NotificationHandler {
             throw new Exception("Please log in first");
         }
     }
+
 }
