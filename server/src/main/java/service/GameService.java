@@ -193,5 +193,19 @@ public class GameService {
     public void resign (String authToken, int gameID)
             throws UnauthorizedException, BadRequestException, DataAccessException {
 
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        String username = authData.username();
+        GameData gameData = gameDAO.getGame(gameID);
+
+        if (gameData == null) {
+            throw new BadRequestException("Error: Bad request");
+        }
+
+        boolean isWhite = username.equals(gameData.whiteUsername());
+        boolean isBlack = username.equals(gameData.blackUsername());
     }
 }

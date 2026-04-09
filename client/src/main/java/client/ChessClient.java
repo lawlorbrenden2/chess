@@ -57,6 +57,77 @@ public class ChessClient implements NotificationHandler {
                 + "] >>> " + SET_TEXT_COLOR_GREEN);
     }
 
+    public String eval(String input) throws Exception {
+        String[] tokens = input.split(" ");
+        String cmd = (tokens.length > 0) ? tokens[0].toLowerCase() : "help";
+        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
+
+        return switch (state) {
+            case LOGGEDOUT -> getLoggedOutInput(params, cmd);
+            case LOGGEDIN -> getLoggedInInput(params, cmd);
+            case GAMEPLAY -> getGameplayInput(params, cmd);
+            case OBSERVER -> getObserverInput(params, cmd);
+        }
+
+//        return switch (cmd) {
+//            case "register" -> register(params);
+//            case "login" -> login(params);
+//            case "create" -> createGame(params);
+//            case "list" -> listGames();
+//            case "join" -> joinGame(params);
+//            case "observe" -> observeGame(params);
+//            case "logout" -> logout();
+//            case "quit" -> "quit";
+//            default -> help();
+//        };
+    }
+
+    private String getLoggedOutInput(String[] params, String cmd) throws Exception {
+        return switch (cmd) {
+            case "register" -> register(params);
+            case "login" -> login(params);
+            case "quit" -> "quit";
+            default -> help();
+        };
+    }
+
+    private String getLoggedInInput(String[] params, String cmd) throws Exception {
+        return switch (cmd) {
+            case "create" -> createGame(params);
+            case "list" -> listGames();
+            case "join" -> joinGame(params);
+            case "observe" -> observeGame(params);
+            case "logout" -> logout();
+            case "quit" -> "quit";
+            default -> help();
+        };
+    }
+
+    private String getGameplayInput(String[] params, String cmd) {
+
+    }
+
+    private String getObserverInput(String[] params, String cmd) {
+
+    }
+
+    public String help() {
+        if (state == State.LOGGEDOUT) {
+            return SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" +
+                    SET_TEXT_COLOR_MAGENTA + " - to create an account\n" +
+                    SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>" + SET_TEXT_COLOR_MAGENTA + " - to play chess\n" +
+                    SET_TEXT_COLOR_BLUE + "quit" + SET_TEXT_COLOR_MAGENTA + " - playing chess\n" +
+                    SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
+        }
+        return SET_TEXT_COLOR_BLUE + "create <NAME>" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
+                SET_TEXT_COLOR_BLUE + "list" + SET_TEXT_COLOR_MAGENTA + " - games\n" +
+                SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
+                SET_TEXT_COLOR_BLUE + "observe <ID>" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
+                SET_TEXT_COLOR_BLUE + "logout" + SET_TEXT_COLOR_MAGENTA + " - when you are done\n" +
+                SET_TEXT_COLOR_BLUE + "quit" + SET_TEXT_COLOR_MAGENTA + " - playing chess\n" +
+                SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
+    }
+
     public String register(String... params) throws Exception {
         if (params.length >= 3) {
             var request = new RegisterRequest(params[0], params[1], params[2]);
@@ -217,39 +288,24 @@ public class ChessClient implements NotificationHandler {
         return "";
     }
 
+    public String redrawBoard(String[] params) {
 
-    public String eval(String input) throws Exception {
-        String[] tokens = input.split(" ");
-        String cmd = (tokens.length > 0) ? tokens[0].toLowerCase() : "help";
-        String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-        return switch (cmd) {
-            case "register" -> register(params);
-            case "login" -> login(params);
-            case "create" -> createGame(params);
-            case "list" -> listGames();
-            case "join" -> joinGame(params);
-            case "observe" -> observeGame(params);
-            case "logout" -> logout();
-            case "quit" -> "quit";
-            default -> help();
-        };
     }
 
-    public String help() {
-        if (state == State.LOGGEDOUT) {
-            return SET_TEXT_COLOR_BLUE + "register <USERNAME> <PASSWORD> <EMAIL>" +
-                    SET_TEXT_COLOR_MAGENTA + " - to create an account\n" +
-                    SET_TEXT_COLOR_BLUE + "login <USERNAME> <PASSWORD>" + SET_TEXT_COLOR_MAGENTA + " - to play chess\n" +
-                    SET_TEXT_COLOR_BLUE + "quit" + SET_TEXT_COLOR_MAGENTA + " - playing chess\n" +
-                    SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
-        }
-        return SET_TEXT_COLOR_BLUE + "create <NAME>" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
-                SET_TEXT_COLOR_BLUE + "list" + SET_TEXT_COLOR_MAGENTA + " - games\n" +
-                SET_TEXT_COLOR_BLUE + "join <ID> [WHITE|BLACK]" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
-                SET_TEXT_COLOR_BLUE + "observe <ID>" + SET_TEXT_COLOR_MAGENTA + " - a game\n" +
-                SET_TEXT_COLOR_BLUE + "logout" + SET_TEXT_COLOR_MAGENTA + " - when you are done\n" +
-                SET_TEXT_COLOR_BLUE + "quit" + SET_TEXT_COLOR_MAGENTA + " - playing chess\n" +
-                SET_TEXT_COLOR_BLUE + "help" + SET_TEXT_COLOR_MAGENTA + " - with possible commands\n";
+    public String leave(String[] params) {
+
+    }
+
+    public String makeMove(String[] params) {
+
+    }
+
+    public String resign(String[] params) {
+
+    }
+
+    public String highlightLegalMoves(String[] params) {
+
     }
 
     @Override
