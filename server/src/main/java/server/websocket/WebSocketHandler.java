@@ -128,7 +128,7 @@ public class WebSocketHandler {
                     connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
                 }
             }
-            if (gameState.isInCheck(WHITE) || gameState.isInCheck(BLACK)) {
+            else if (gameState.isInCheck(WHITE) || gameState.isInCheck(BLACK)) {
                 connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage("Check!")));
 
             }
@@ -175,7 +175,6 @@ public class WebSocketHandler {
                     updatedGame.blackUsername() : updatedGame.whiteUsername();
             String resignMessage = username + " resigned. " + winner + " wins!";
 
-            connectionManager.removeConnection(ctx);
             connectionManager.broadcastToGameExceptSender(
                     command.getGameID(),
                     ctx,
