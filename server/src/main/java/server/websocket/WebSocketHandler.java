@@ -55,9 +55,7 @@ public class WebSocketHandler {
                     resign(ctx, resignCommand);
                 }
                 default -> {
-                    ctx.send(
-                            gson.toJson(new ErrorMessage("Unknown command"))
-                    );
+                    ctx.send(gson.toJson(new ErrorMessage("Error: Unknown command")));
                 }
             }
 
@@ -76,22 +74,22 @@ public class WebSocketHandler {
 
             ctx.send(gson.toJson(new LoadGameMessage(gameData.game())));
 
-            String role = " an observer.";
+            String role = "an observer.";
 
             if (username.equals(gameData.whiteUsername())) {
-                role = " as White.";
+                role = "White.";
             } else if (username.equals(gameData.blackUsername())) {
-                role = " as Black.";
+                role = "Black.";
             }
 
             String joinMessage = username + " joined the game as " + role;
-            connectionManager.broadcastToGame(
+            connectionManager.broadcastToGameExceptSender(
                     command.getGameID(),
+                    ctx,
                     gson.toJson(new NotificationMessage(joinMessage))
             );
         } catch (Exception e) {
-            ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
-        }
+            ctx.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));        }
     }
 
     private void makeMove(WsContext ctx, MakeMoveCommand command) {
@@ -104,8 +102,9 @@ public class WebSocketHandler {
             );
 
             String moveNotification = username + " played " + formatMove(command);
-            connectionManager.broadcastToGame(
+            connectionManager.broadcastToGameExceptSender(
                     command.getGameID(),
+                    ctx,
                     gson.toJson(new NotificationMessage(moveNotification))
             );
 
@@ -129,17 +128,16 @@ public class WebSocketHandler {
                     connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
                 }
             }
-            if (gameState.isInCheck(WHITE)) {
+            if (gameState.isInCheck(WHITE) && !gameState.isGameOver()) {
                 String msg = updatedGame.whiteUsername() + " is in Check!";
                 connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
-            } else if (gameState.isInCheck(BLACK)) {
+            } else if (gameState.isInCheck(BLACK) && !gameState.isGameOver()) {
                 String msg = updatedGame.blackUsername() + " is in Check!";
                 connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
             }
 
         } catch (Exception e) {
-            ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
-        }
+            ctx.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));        }
     }
 
     private void leave(WsContext ctx, LeaveCommand command) {
@@ -160,8 +158,7 @@ public class WebSocketHandler {
                     );
 
         } catch (Exception e) {
-            ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
-        }
+            ctx.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));        }
     }
 
     private void resign(WsContext ctx, ResignCommand command) {
@@ -179,9 +176,8 @@ public class WebSocketHandler {
                     updatedGame.blackUsername() : updatedGame.whiteUsername();
             String resignMessage = username + " resigned. " + winner + " wins!";
 
-            connectionManager.broadcastToGameExceptSender(
+            connectionManager.broadcastToGame(
                     command.getGameID(),
-                    ctx,
                     gson.toJson(new NotificationMessage(resignMessage))
             );
 
@@ -191,8 +187,7 @@ public class WebSocketHandler {
             );
 
         } catch (Exception e) {
-            ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
-        }
+            ctx.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));        }
     }
 
     private String formatMove(MakeMoveCommand command) {
@@ -204,7 +199,4 @@ public class WebSocketHandler {
 
         return "" + startCol + startPos.getRow() + endCol + endPos.getRow();
     }
-
-
-
 }

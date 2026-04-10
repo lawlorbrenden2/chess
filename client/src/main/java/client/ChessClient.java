@@ -7,7 +7,6 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
-import jdk.jshell.spi.ExecutionControlProvider;
 import model.request.CreateGameRequest;
 import model.request.JoinGameRequest;
 import model.request.LoginRequest;
@@ -389,13 +388,12 @@ public class ChessClient implements NotificationHandler {
         }
         ws.sendCommand(new ResignCommand(authToken, currentGameID));
         int oldGameID = currentGameID;
-        currentGameID = null;
         return SET_TEXT_COLOR_BLUE + "Resigned from game " + oldGameID;
 }
 
     public String highlightLegalMoves(String[] params) throws Exception {
         if (params.length != 1) {
-            throw new Exception("Error: Expected format: highlight <SQUARE>");
+            throw new Exception("Expected format: highlight <SQUARE>");
         }
         return "";
     }
@@ -438,7 +436,7 @@ public class ChessClient implements NotificationHandler {
 
     @Override
     public void notifyError(ErrorMessage errorMessage) {
-        System.out.println("\n" + SET_TEXT_COLOR_RED + "\nERROR: " + errorMessage.getError());
+        System.out.println("\n" + SET_TEXT_COLOR_RED + "\nError: " + errorMessage.getError());
         printPrompt();
     }
 

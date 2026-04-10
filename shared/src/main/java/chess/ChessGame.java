@@ -105,6 +105,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (isGameOver()) {
+            throw new InvalidMoveException("The game is over.");
+        }
+
         ChessPosition start = move.getStartPosition();
         ChessPiece piece = this.board.getPiece(start);
 
@@ -122,6 +126,9 @@ public class ChessGame {
         updateCastlingRights(piece, move);
         switchTurns();
 
+        if (isInCheckmate(teamTurn) || isInStalemate(teamTurn)) {
+            setGameOver(true);
+        }
     }
 
     /**
@@ -434,7 +441,6 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        gameOver = true;
         return isInCheck(teamColor) && !hasAvailableMoves(teamColor);
     }
 
@@ -446,7 +452,6 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        gameOver = true;
         return !isInCheck(teamColor) && !hasAvailableMoves(teamColor);
     }
 
@@ -505,6 +510,4 @@ public class ChessGame {
     public int hashCode() {
         return Objects.hash(board, teamTurn);
     }
-
-
 }

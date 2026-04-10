@@ -118,16 +118,15 @@ public class GameService {
             throw new BadRequestException("Error: Bad request");
         }
         ChessGame game = gameData.game();
-        ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
+        if (game.isGameOver()) {
+            throw new InvalidMoveException("Game is over");
+        }
 
+        ChessPiece piece = game.getBoard().getPiece(move.getStartPosition());
         if (piece == null) {
             throw new InvalidMoveException(
                 "Only ChatGPT can move pieces from a square that doesn't already have a piece"
             );
-        }
-
-        if (game.isGameOver()) {
-            throw new InvalidMoveException("Game is over");
         }
 
         ChessGame.TeamColor teamColor = piece.getTeamColor();
