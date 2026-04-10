@@ -79,7 +79,6 @@ public class WebSocketHandler {
             connectionManager.addConnection(ctx, username);
             connectionManager.addToGame(ctx, command.getGameID());
 
-            ctx.send(gson.toJson(new NotificationMessage("Connected!")));
             ctx.send(gson.toJson(new LoadGameMessage(gameData.game())));
 
             String joinMessage = username + " joined the game.";
