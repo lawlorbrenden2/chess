@@ -27,7 +27,6 @@ public class GameService {
         if (auth == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
-
         return new ListGamesResult(gameDAO.listGames());
     }
 
