@@ -145,7 +145,7 @@ public class ChessClient implements NotificationHandler {
             case GAMEPLAY ->
                     SET_TEXT_COLOR_BLUE + "redraw" +
                     SET_TEXT_COLOR_MAGENTA + " - redraw board\n" +
-                    SET_TEXT_COLOR_BLUE + "move <from> <to>" +
+                    SET_TEXT_COLOR_BLUE + "move <FROM><TO> <PROMOTION_PIECE>\n" +
                     SET_TEXT_COLOR_MAGENTA + " - make a move\n" +
                     SET_TEXT_COLOR_BLUE + "leave" +
                     SET_TEXT_COLOR_MAGENTA + " - leave game\n" +
@@ -328,7 +328,16 @@ public class ChessClient implements NotificationHandler {
         return "";
     }
 
-    public String redrawBoard(String[] params) {
+    public String redrawBoard(String[] params) throws Exception {
+        if (currentGame == null) {
+            throw new Exception("You haven't joined a game!");
+        }
+
+        System.out.println();
+        ChessBoardUI.drawChessBoard(
+                currentGame, String.valueOf(teamColor != null ? teamColor : ChessGame.TeamColor.WHITE
+                ));
+
         return "";
     }
 
@@ -385,7 +394,10 @@ public class ChessClient implements NotificationHandler {
         return SET_TEXT_COLOR_BLUE + "Resigned from game " + oldGameID;
 }
 
-    public String highlightLegalMoves(String[] params) {
+    public String highlightLegalMoves(String[] params) throws Exception {
+        if (params.length != 1) {
+            throw new Exception("Error: Expected format: highlight <SQUARE>");
+        }
         return "";
     }
 
@@ -402,7 +414,7 @@ public class ChessClient implements NotificationHandler {
         int col = (colChar - 'a') + 1;
         int row = (rowChar - '1') + 1;
 
-        if (col < 0 || col > 7 || row < 0 || row > 7) {
+        if (col < 1 || col > 8 || row < 1 || row > 8) {
             throw new Exception("Position out of bounds. Must be between a1 and h8.");
         }
 
