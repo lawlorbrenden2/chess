@@ -1,12 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 import static ui.EscapeSequences.*;
 
@@ -17,6 +15,9 @@ public class ChessBoardUI {
     private static final String BORDER_COLOR = SET_BG_COLOR_DARK_GREY;
     private static final String BORDER_TEXT_COLOR = SET_TEXT_COLOR_WHITE;
     private static final String PIECE_TEXT_COLOR = SET_TEXT_COLOR_BLACK;
+    private static final String HIGHLIGHT_LIGHT_COLOR = SET_BG_COLOR_GREEN;
+    private static final String HIGHLIGHT_DARK_COLOR = SET_BG_COLOR_DARK_GREEN;
+    private static final String START_SQUARE_COLOR = SET_BG_COLOR_YELLOW;
 
     private static final String[] ROW_LABELS = {"1", "2", "3", "4", "5", "6", "7", "8"};
     private static final String[] COLUMN_LABELS = {"a", "b", "c", "d", "e", "f", "g", "h"};
@@ -28,7 +29,7 @@ public class ChessBoardUI {
         out.println(ERASE_SCREEN);
 
         drawHorizontalBorder(out, isBlack);
-        drawRows(out, game, isBlack);
+        drawRows(out, game, isBlack, null, null);
         drawHorizontalBorder(out, isBlack);
     }
 
@@ -54,7 +55,13 @@ public class ChessBoardUI {
         out.println();
     }
 
-    public static void drawRows(PrintStream out, ChessGame game, boolean isBlack) {
+    public static void drawRows(
+            PrintStream out,
+            ChessGame game,
+            boolean isBlack,
+            ChessPosition startPos,
+            java.util.Set<ChessPosition> highlightPositions
+    ) {
         ChessBoard board = game.getBoard();
 
         // set starting and ending rows and columns plus the direction we're moving through them
@@ -72,13 +79,16 @@ public class ChessBoardUI {
             out.print(" " + ROW_LABELS[row] + " ");
 
             for (int col = startCol; isBlack ? col >= endCol : col <= endCol; col += colDirection) {
-                if ((row + col) % 2 == 0) {
-                    out.print(DARK_SQUARE_COLOR);
-                }
-                else {
-                    out.print(LIGHT_SQUARE_COLOR);
-                }
                 ChessPosition square = new ChessPosition(row + 1, col + 1);
+                boolean isDark = (row + col) % 2 == 0;
+
+                if (square.equals(startPos)) {
+                    out.print(START_SQUARE_COLOR);
+                } else if (highlightPositions != null && highlightPositions.contains(square)) {
+                    out.print(isDark ? HIGHLIGHT_DARK_COLOR : HIGHLIGHT_LIGHT_COLOR);
+                } else {
+                    out.print(isDark ? DARK_SQUARE_COLOR : LIGHT_SQUARE_COLOR);
+                }
                 ChessPiece piece = board.getPiece(square);
                 out.print(PIECE_TEXT_COLOR);
                 out.print(getPieceString(piece));
@@ -109,6 +119,25 @@ public class ChessBoardUI {
             case ROOK -> isBlack ? BLACK_ROOK : WHITE_ROOK;
             case PAWN -> isBlack ? BLACK_PAWN : WHITE_PAWN;
         };
+    }
+
+    public static void drawChessBoardWithHighlights(
+            ChessGame game, String teamColor,
+            ChessPosition startPos,
+            Collection<ChessMove> validMoves
+    ) {
+        boolean isBlack = teamColor.equals("BLACK");
+        java.util.Set<ChessPosition> highlightPositions = new java.util.HashSet<>();
+        for (ChessMove move : validMoves) {
+            highlightPositions.add(move.getEndPosition());
+        }
+
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        out.println(ERASE_SCREEN);
+
+        drawHorizontalBorder(out, isBlack);
+        drawRows(out, game, isBlack, startPos, highlightPositions);
+        drawHorizontalBorder(out, isBlack);
     }
 
 }

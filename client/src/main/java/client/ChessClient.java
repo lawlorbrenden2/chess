@@ -377,7 +377,6 @@ public class ChessClient implements NotificationHandler {
         return "";
     }
 
-
     public String resign(String[] params) throws Exception {
         Scanner scanner = new Scanner(System.in);
         System.out.print(SET_TEXT_COLOR_GREEN + "Are you sure you want to resign? (yes/no): ");
@@ -393,8 +392,29 @@ public class ChessClient implements NotificationHandler {
 
     public String highlightLegalMoves(String[] params) throws Exception {
         if (params.length != 1) {
-            throw new Exception("Expected format: highlight <SQUARE>");
+            throw new Exception("Expected format: highlight <SQUARE> (e.g., highlight e2)");
         }
+
+        if (currentGame == null) {
+            throw new Exception("No active game. Join a game first!");
+        }
+
+        ChessPosition square = parseCoordinatesHelper(params[0]);
+        var moves = currentGame.validMoves(square);
+
+        if (moves == null || moves.isEmpty()) {
+            throw new Exception("No legal moves for that square!");
+        }
+
+        System.out.println();
+        ChessBoardUI.drawChessBoardWithHighlights(
+                currentGame,
+                String.valueOf(teamColor != null ? teamColor : ChessGame.TeamColor.WHITE),
+                square,
+                moves
+        );
+
+
         return "";
     }
 
