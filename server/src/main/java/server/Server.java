@@ -1,17 +1,12 @@
 package server;
 
 import dataaccess.*;
-import dataaccess.memorydao.*;
-import dataaccess.sqldao.SQLAuthDAO;
-import dataaccess.sqldao.SQLGameDAO;
-import dataaccess.sqldao.SQLUserDAO;
+
+import dataaccess.sqldao.*;
 import io.javalin.*;
 import server.handlers.*;
 import server.websocket.WebSocketHandler;
-import service.ClearService;
-import service.GameService;
-import service.UserService;
-
+import service.*;
 
 public class Server {
     private final Javalin javalin;
@@ -24,7 +19,7 @@ public class Server {
             GameDAO gameDAO = new SQLGameDAO();
 
             UserService userService = new UserService(userDAO, authDAO);
-            GameService gameService = new GameService(userDAO, gameDAO, authDAO);
+            GameService gameService = new GameService(gameDAO, authDAO);
             ClearService clearService = new ClearService(gameDAO, userDAO, authDAO);
 
             WebSocketHandler webSocketHandler = new WebSocketHandler(gameService);

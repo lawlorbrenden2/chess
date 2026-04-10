@@ -179,12 +179,6 @@ public class WebSocketHandler {
                     command.getGameID(),
                     gson.toJson(new NotificationMessage(resignMessage))
             );
-
-            connectionManager.broadcastToGame(
-                    command.getGameID(),
-                    gson.toJson(new LoadGameMessage(updatedGame.game()))
-            );
-
         } catch (Exception e) {
             ctx.send(gson.toJson(new ErrorMessage("Error: " + e.getMessage())));        }
     }

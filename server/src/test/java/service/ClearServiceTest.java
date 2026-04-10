@@ -21,7 +21,7 @@ public class ClearServiceTest {
         AuthDAO authDAO = new SQLAuthDAO();
 
         UserService userService = new UserService(userDAO, authDAO);
-        GameService gameService = new GameService(userDAO, gameDAO, authDAO);
+        GameService gameService = new GameService(gameDAO, authDAO);
         ClearService clearService = new ClearService(gameDAO, userDAO, authDAO);
 
         RegisterRequest registerRequest = new RegisterRequest("abc", "123", "my_email.asu.edu");

@@ -7,26 +7,17 @@ import chess.InvalidMoveException;
 import dataaccess.*;
 import model.data.AuthData;
 import model.data.GameData;
-import model.data.UserData;
-import model.request.CreateGameRequest;
-import model.request.JoinGameRequest;
-import model.request.ListGamesRequest;
-import model.result.CreateGameResult;
-import model.result.JoinGameResult;
-import model.result.ListGamesResult;
-import service.exceptions.AlreadyTakenException;
-import service.exceptions.BadRequestException;
-import service.exceptions.UnauthorizedException;
+import model.request.*;
+import model.result.*;
+import service.exceptions.*;
 
 public class GameService {
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
-    private final UserDAO userDAO;
 
-    public GameService(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
+    public GameService(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
-        this.userDAO = userDAO;
     }
 
     public ListGamesResult listGames(ListGamesRequest request)
@@ -204,9 +195,13 @@ public class GameService {
             throw new BadRequestException("Error: Bad request");
         }
 
+        if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
+            throw new Exception("Only active players can resign, not observers.");
+        }
+
         ChessGame game = gameData.game();
         if (game.isGameOver()) {
-            throw new Exception("Game already over");
+            throw new Exception("Game already over.");
         }
 
         game.setGameOver(true);

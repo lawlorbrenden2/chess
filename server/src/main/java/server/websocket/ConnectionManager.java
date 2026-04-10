@@ -1,9 +1,6 @@
 package server.websocket;
 
-import model.data.GameData;
 import io.javalin.websocket.WsContext;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

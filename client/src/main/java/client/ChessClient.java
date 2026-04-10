@@ -3,14 +3,8 @@ package client;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
-import model.request.CreateGameRequest;
-import model.request.JoinGameRequest;
-import model.request.LoginRequest;
-import model.request.RegisterRequest;
+import chess.*;
+import model.request.*;
 import server.ServerFacade;
 import ui.ChessBoardUI;
 import websocket.NotificationHandler;
@@ -306,7 +300,6 @@ public class ChessClient implements NotificationHandler {
 
             int gameID = gameIDMap.get(gameNumber - 1);
             currentGameID = gameID;
-
 
             ws = new WebSocketFacade(this);
             ws.connect("ws://localhost:8080/ws");
