@@ -474,28 +474,15 @@ public class ChessGame {
             }
         }
         return false;
-
     }
 
-
-    /**
-     * Sets this game's chessboard with a given board
-     *
-     * @param board the new board to use
-     */
     public void setBoard(ChessBoard board) {
         this.board = board;
     }
 
-    /**
-     * Gets the current chessboard
-     *
-     * @return the chessboard
-     */
     public ChessBoard getBoard() {
         return board;
     }
-
 
     @Override
     public boolean equals(Object o) {

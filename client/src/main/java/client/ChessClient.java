@@ -25,7 +25,6 @@ public class ChessClient implements NotificationHandler {
     private Integer currentGameID;
     private ChessGame currentGame;
 
-
     public ChessClient(String serverURL) throws Exception {
         server = new ServerFacade(serverURL);
     }
@@ -40,7 +39,6 @@ public class ChessClient implements NotificationHandler {
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
-
             try {
                 result = eval(line);
                 System.out.print(result);
@@ -120,7 +118,6 @@ public class ChessClient implements NotificationHandler {
                     SET_TEXT_COLOR_MAGENTA + " - exit\n" +
                     SET_TEXT_COLOR_BLUE + "help" +
                     SET_TEXT_COLOR_MAGENTA + " - show commands\n";
-
             case LOGGEDIN ->
                     SET_TEXT_COLOR_BLUE + "create <NAME>" +
                     SET_TEXT_COLOR_MAGENTA + " - create a game\n" +
@@ -134,7 +131,6 @@ public class ChessClient implements NotificationHandler {
                     SET_TEXT_COLOR_MAGENTA + " - logout\n" +
                     SET_TEXT_COLOR_BLUE + "quit" +
                     SET_TEXT_COLOR_MAGENTA + " - exit\n";
-
             case GAMEPLAY ->
                     SET_TEXT_COLOR_BLUE + "redraw" +
                     SET_TEXT_COLOR_MAGENTA + " - redraw board\n" +
@@ -146,7 +142,6 @@ public class ChessClient implements NotificationHandler {
                     SET_TEXT_COLOR_MAGENTA + " - resign game\n" +
                     SET_TEXT_COLOR_BLUE + "highlight <SQUARE>" +
                     SET_TEXT_COLOR_MAGENTA + " - show legal moves\n";
-
             case OBSERVER ->
                     SET_TEXT_COLOR_BLUE + "redraw" +
                     SET_TEXT_COLOR_MAGENTA + " - redraw board\n" +
@@ -165,7 +160,6 @@ public class ChessClient implements NotificationHandler {
             server.setAuthToken(authToken);
             state = State.LOGGEDIN;
             username = params[0];
-
             return "Registered as " + username;
         }
         throw new Exception("Expected: <username> <password> <email>");
@@ -179,7 +173,6 @@ public class ChessClient implements NotificationHandler {
             server.setAuthToken(authToken);
             state = State.LOGGEDIN;
             username = params[0];
-
             return "Logged in as " + username;
         }
         throw new Exception("Expected: <username> <password>");
@@ -190,9 +183,7 @@ public class ChessClient implements NotificationHandler {
         if (params.length >= 1) {
             var request = new CreateGameRequest(authToken, params[0]);
             var result = server.createGame(request);
-
             gameIDMap.add(result.gameID());
-
             return "Created game " + params[0] + " with game number: " + result.gameID();
         }
         throw new Exception("Expected: gameName");
@@ -270,9 +261,6 @@ public class ChessClient implements NotificationHandler {
             ws.connect("ws://localhost:8080/ws");
             Thread.sleep(200);
             ws.sendCommand(new ConnectCommand(authToken, gameID));
-
-            // replaced with websocket message
-//            System.out.println("Joined game with gameID: " + gameNumber + " and color " + teamColor + "\n");
 
             return "";
         }
@@ -394,7 +382,6 @@ public class ChessClient implements NotificationHandler {
 
         ChessPosition square = parseCoordinatesHelper(params[0]);
         var moves = currentGame.validMoves(square);
-
         if (moves == null || moves.isEmpty()) {
             throw new Exception("No legal moves for that square!");
         }
@@ -406,7 +393,6 @@ public class ChessClient implements NotificationHandler {
                 square,
                 moves
         );
-
 
         return "";
     }
@@ -466,5 +452,4 @@ public class ChessClient implements NotificationHandler {
             throw new Exception("Please log in first");
         }
     }
-
 }
