@@ -446,8 +446,7 @@ public class ChessClient implements NotificationHandler {
     @Override
     public void loadGame(ChessGame game) {
         this.currentGame = game;
-
-        System.out.println("\nGame updated:");
+        System.out.println();
         ChessBoardUI.drawChessBoard(game, String.valueOf(teamColor != null ? teamColor : ChessGame.TeamColor.WHITE));
         printPrompt();
     }
