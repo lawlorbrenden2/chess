@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import chess.ChessGame;
+import jdk.jshell.spi.ExecutionControlProvider;
 import model.request.CreateGameRequest;
 import model.request.JoinGameRequest;
 import model.request.LoginRequest;
@@ -349,7 +350,25 @@ public class ChessClient implements NotificationHandler {
         return SET_TEXT_COLOR_BLUE + "Left game " + oldGameID;
     }
 
-    public String makeMove(String[] params) {
+    public String makeMove(String[] params) throws Exception {
+        if (params.length == 0) {
+            throw new Exception("Expected: move <FROM> <TO>");
+        }
+
+        String startPos;
+        String endPos;
+
+        if (params.length == 1 && params[0].length() == 4) {
+            startPos = params[0].substring(0, 2);
+            endPos = params[0].substring(2, 4);
+        }
+        else if(params.length >= 2) {
+            startPos = params[0];
+            endPos = params[1];
+        }
+        else {
+            throw new Exception("Invalid move format");
+        }
         return "";
     }
 

@@ -41,9 +41,18 @@ public class WebSocketHandler {
 
             switch (command.getCommandType()) {
                 case CONNECT -> connect(ctx, command);
-                case MAKE_MOVE -> makeMove(ctx, (MakeMoveCommand) command);
-                case LEAVE -> leave(ctx, (LeaveCommand) command);
-                case RESIGN -> resign(ctx, (ResignCommand) command);
+                case MAKE_MOVE -> {
+                    MakeMoveCommand moveCommand = gson.fromJson(message, MakeMoveCommand.class);
+                    makeMove(ctx, moveCommand);
+                }
+                case LEAVE -> {
+                    LeaveCommand leaveCommand = gson.fromJson(message, LeaveCommand.class);
+                    leave(ctx, leaveCommand);
+                }
+                case RESIGN -> {
+                    ResignCommand resignCommand = gson.fromJson(message, ResignCommand.class);
+                    resign(ctx, resignCommand);
+                }
                 default -> {
                     ctx.send(
                             gson.toJson(new ErrorMessage("Unknown command"))

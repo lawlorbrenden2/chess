@@ -187,8 +187,6 @@ public class GameService {
             );
             gameDAO.updateGame(updatedGame);
         }
-
-
     }
 
     public GameData resign (String authToken, int gameID)
