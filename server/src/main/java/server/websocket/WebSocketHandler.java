@@ -154,7 +154,7 @@ public class WebSocketHandler {
             connectionManager.broadcastToGameExceptSender(
                     command.getGameID(),
                     ctx,
-                    gson.toJson(new NotificationMessage(username + " left the game!"))
+                    gson.toJson(new NotificationMessage(username + " left the game."))
                     );
 
         } catch (Exception e) {
