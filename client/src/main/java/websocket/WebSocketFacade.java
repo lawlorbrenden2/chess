@@ -16,7 +16,7 @@ import websocket.messages.ServerMessage;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Scanner;
+
 
 
 public class WebSocketFacade extends Endpoint {
@@ -31,9 +31,12 @@ public class WebSocketFacade extends Endpoint {
     public void connect(String url) throws Exception {
         URI uri = new URI(url);
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        container.connectToServer(this, uri);
+    }
 
-        this.session = container.connectToServer(this, uri);
-
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+        this.session = session;
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
             @Override
             public void onMessage(String message) {
@@ -72,8 +75,4 @@ public class WebSocketFacade extends Endpoint {
             e.printStackTrace();
         }
     }
-
-
-    @Override
-    public void onOpen(Session session, EndpointConfig endpointConfig) {}
 }

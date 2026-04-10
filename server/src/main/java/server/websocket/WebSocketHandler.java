@@ -15,6 +15,8 @@ import service.GameService;
 import websocket.commands.*;
 import websocket.messages.*;
 
+import java.time.Duration;
+
 public class WebSocketHandler {
 
     private final Gson gson = new Gson();
@@ -29,6 +31,7 @@ public class WebSocketHandler {
 
     public void register(Javalin app) {
         app.ws("/ws", ws -> {
+            ws.onConnect(ctx -> ctx.session.setIdleTimeout(Duration.ofMinutes(10)));
             ws.onMessage(ctx -> handleMessage(ctx, ctx.message()));
             ws.onClose(connectionManager::removeConnection);
         });

@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import jdk.jshell.spi.ExecutionControlProvider;
 import model.request.CreateGameRequest;
 import model.request.JoinGameRequest;
@@ -23,7 +26,7 @@ public class ChessClient implements NotificationHandler {
     private final ServerFacade server;
     private State state = State.LOGGEDOUT;
     private String username;
-    private String teamColor;
+    private ChessGame.TeamColor teamColor;
     private final java.util.List<Integer> gameIDMap = new java.util.ArrayList<>();
     private WebSocketFacade ws;
     private Integer currentGameID;
@@ -70,18 +73,6 @@ public class ChessClient implements NotificationHandler {
             case GAMEPLAY -> getGameplayInput(params, cmd);
             case OBSERVER -> getObserverInput(params, cmd);
         };
-
-//        return switch (cmd) {
-//            case "register" -> register(params);
-//            case "login" -> login(params);
-//            case "create" -> createGame(params);
-//            case "list" -> listGames();
-//            case "join" -> joinGame(params);
-//            case "observe" -> observeGame(params);
-//            case "logout" -> logout();
-//            case "quit" -> "quit";
-//            default -> help();
-//        };
     }
 
     private String getLoggedOutInput(String[] params, String cmd) throws Exception {
@@ -276,8 +267,8 @@ public class ChessClient implements NotificationHandler {
                 throw new Exception("Color must be WHITE or BLACK");
             }
 
-            teamColor = colorInput;
-            var request = new JoinGameRequest(authToken, teamColor, gameID);
+            teamColor = colorInput.equals("WHITE") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK ;
+            var request = new JoinGameRequest(authToken, colorInput, gameID);
             server.joinGame(request);
             state = State.GAMEPLAY;
             currentGameID = gameID;
@@ -351,30 +342,36 @@ public class ChessClient implements NotificationHandler {
     }
 
     public String makeMove(String[] params) throws Exception {
-        if (params.length == 0) {
-            throw new Exception("Expected: move <FROM> <TO>");
+        if (params.length == 0 || params.length > 2) {
+            throw new Exception("Expected format: move <FROM><TO> <PROMOTION> (e.g., e2e4 or e7e8 queen)");
         }
 
-        String startPos;
-        String endPos;
+        String moveString = params[0];
+        if (moveString.length() != 4) {
+            throw new Exception("Coordinates must be exactly 4 characters (e.g., e2e4).");
+        }
 
-        if (params.length == 1 && params[0].length() == 4) {
-            startPos = params[0].substring(0, 2);
-            endPos = params[0].substring(2, 4);
+        String startString = moveString.substring(0, 2);
+        String endString = moveString.substring(2, 4);
+
+        ChessPosition startPos = parseCoordinatesHelper(startString);
+        ChessPosition endPos = parseCoordinatesHelper(endString);
+
+        ChessPiece.PieceType promotionPiece = null;
+
+        if (params.length == 2) {
+            promotionPiece = checkPromotionPieceHelper(params[1]);
         }
-        else if(params.length >= 2) {
-            startPos = params[0];
-            endPos = params[1];
-        }
-        else {
-            throw new Exception("Invalid move format");
-        }
+
+        ChessMove move = new ChessMove(startPos, endPos, promotionPiece);
+        ws.sendCommand(new MakeMoveCommand(authToken, currentGameID, move));
         return "";
     }
 
+
     public String resign(String[] params) throws Exception {
         Scanner scanner = new Scanner(System.in);
-        System.out.print(SET_TEXT_COLOR_RED + "Are you sure you want to resign? (yes/no): ");
+        System.out.print(SET_TEXT_COLOR_GREEN + "Are you sure you want to resign? (yes/no): ");
         String response = scanner.nextLine().trim().toLowerCase();
 
         if (!response.equals("yes") && (!response.equals("y"))) {
@@ -392,6 +389,36 @@ public class ChessClient implements NotificationHandler {
         return "";
     }
 
+    private ChessPosition parseCoordinatesHelper(String pos) throws Exception {
+        if (pos == null || pos.length() != 2) {
+            throw new Exception("Invalid position format: " + pos);
+        }
+
+        pos = pos.toLowerCase();
+        char colChar = pos.charAt(0);
+        char rowChar = pos.charAt(1);
+
+        // Use ASCII math
+        int col = (colChar - 'a') + 1;
+        int row = (rowChar - '1') + 1;
+
+        if (col < 0 || col > 7 || row < 0 || row > 7) {
+            throw new Exception("Position out of bounds. Must be between a1 and h8.");
+        }
+
+        return new ChessPosition(row, col);
+    }
+
+    private ChessPiece.PieceType checkPromotionPieceHelper(String piece) throws Exception {
+        return switch (piece.toUpperCase()) {
+            case "Q", "QUEEN" -> ChessPiece.PieceType.QUEEN;
+            case "R", "ROOK" -> ChessPiece.PieceType.ROOK;
+            case "B", "BISHOP" -> ChessPiece.PieceType.BISHOP;
+            case "N", "KNIGHT" -> ChessPiece.PieceType.KNIGHT;
+            default -> throw new Exception("Invalid promotion piece. Use Q, R, B, or N.");
+        };
+    }
+
     @Override
     public void notifyMessage(NotificationMessage notificationMessage) {
         System.out.println("\n" + notificationMessage.getMessage());
@@ -400,7 +427,7 @@ public class ChessClient implements NotificationHandler {
 
     @Override
     public void notifyError(ErrorMessage errorMessage) {
-        System.out.println("\nERROR: " + errorMessage.getError());
+        System.out.println("\n" + SET_TEXT_COLOR_RED + "\nERROR: " + errorMessage.getError());
         printPrompt();
     }
 
@@ -408,7 +435,7 @@ public class ChessClient implements NotificationHandler {
     public void loadGame(ChessGame game) {
         this.currentGame = game;
         System.out.println("\nGame updated:");
-        ChessBoardUI.drawChessBoard(game, teamColor != null ? teamColor : "WHITE");
+        ChessBoardUI.drawChessBoard(game, String.valueOf(teamColor != null ? teamColor : ChessGame.TeamColor.WHITE));
         printPrompt();
     }
 
