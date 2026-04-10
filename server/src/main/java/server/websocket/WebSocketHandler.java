@@ -114,7 +114,6 @@ public class WebSocketHandler {
             );
 
             ChessGame gameState = updatedGame.game();
-
             if (gameState.isGameOver()) {
                 if (gameState.isInCheckmate(WHITE)) {
                     String msg = "Checkmate! " +  updatedGame.blackUsername() + " wins!";
