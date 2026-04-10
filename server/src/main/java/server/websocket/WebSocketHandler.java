@@ -4,13 +4,8 @@ package server.websocket;
 import chess.ChessGame;
 import chess.ChessPosition;
 import com.google.gson.Gson;
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
 import io.javalin.Javalin;
 import io.javalin.websocket.WsContext;
-import model.data.AuthData;
 import model.data.GameData;
 
 import service.GameService;
@@ -81,10 +76,17 @@ public class WebSocketHandler {
 
             ctx.send(gson.toJson(new LoadGameMessage(gameData.game())));
 
-            String joinMessage = username + " joined the game.";
-            connectionManager.broadcastToGameExceptSender(
+            String role = " an observer.";
+
+            if (username.equals(gameData.whiteUsername())) {
+                role = " as White.";
+            } else if (username.equals(gameData.blackUsername())) {
+                role = " as Black.";
+            }
+
+            String joinMessage = username + " joined the game as " + role;
+            connectionManager.broadcastToGame(
                     command.getGameID(),
-                    ctx,
                     gson.toJson(new NotificationMessage(joinMessage))
             );
         } catch (Exception e) {
@@ -127,9 +129,12 @@ public class WebSocketHandler {
                     connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
                 }
             }
-            else if (gameState.isInCheck(WHITE) || gameState.isInCheck(BLACK)) {
-                connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage("Check!")));
-
+            if (gameState.isInCheck(WHITE)) {
+                String msg = updatedGame.whiteUsername() + " is in Check!";
+                connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
+            } else if (gameState.isInCheck(BLACK)) {
+                String msg = updatedGame.blackUsername() + " is in Check!";
+                connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
             }
 
         } catch (Exception e) {

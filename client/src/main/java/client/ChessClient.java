@@ -278,7 +278,8 @@ public class ChessClient implements NotificationHandler {
             Thread.sleep(200);
             ws.sendCommand(new ConnectCommand(authToken, gameID));
 
-            System.out.println("Joined game with gameID: " + gameNumber + " and color " + teamColor + "\n");
+            // replaced with websocket message
+//            System.out.println("Joined game with gameID: " + gameNumber + " and color " + teamColor + "\n");
 
             return "";
         }

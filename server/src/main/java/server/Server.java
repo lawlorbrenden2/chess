@@ -6,7 +6,6 @@ import dataaccess.sqldao.SQLAuthDAO;
 import dataaccess.sqldao.SQLGameDAO;
 import dataaccess.sqldao.SQLUserDAO;
 import io.javalin.*;
-import jakarta.websocket.WebSocketContainer;
 import server.handlers.*;
 import server.websocket.WebSocketHandler;
 import service.ClearService;
@@ -15,7 +14,6 @@ import service.UserService;
 
 
 public class Server {
-
     private final Javalin javalin;
 
     public Server() {
