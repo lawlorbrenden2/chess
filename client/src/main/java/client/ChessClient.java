@@ -329,7 +329,7 @@ public class ChessClient implements NotificationHandler {
     }
 
     public String redrawBoard(String[] params) throws Exception {
-        if (currentGame == null) {
+        if (currentGameID == null) {
             throw new Exception("You haven't joined a game!");
         }
 
