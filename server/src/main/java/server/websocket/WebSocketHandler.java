@@ -1,6 +1,7 @@
 package server.websocket;
 
 
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -85,10 +86,19 @@ public class WebSocketHandler {
 
     private void makeMove(WsContext ctx, MakeMoveCommand command) {
         try {
+
+            AuthData authData = authDAO.getAuth(command.getAuthToken());
+            String username = (authData != null) ? authData.username() : "Unknown";
             GameData updatedGame = gameService.makeMove(
                     command.getAuthToken(),
                     command.getGameID(),
                     command.getChessMove()
+            );
+
+            String moveNotification = username + " played " + formatMove(command);
+            connectionManager.broadcastToGame(
+                    command.getGameID(),
+                    gson.toJson(new NotificationMessage(moveNotification))
             );
 
             connectionManager.broadcastToGame(
@@ -152,6 +162,16 @@ public class WebSocketHandler {
         } catch (Exception e) {
             ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
         }
+    }
+
+    private String formatMove(MakeMoveCommand command) {
+        ChessPosition startPos = command.getChessMove().getStartPosition();
+        ChessPosition endPos = command.getChessMove().getEndPosition();
+
+        char startCol = (char) ('a' + startPos.getColumn() - 1);
+        char endCol = (char) ('a' + endPos.getColumn() - 1);
+
+        return "" + startCol + startPos.getRow() + " to " + endCol + endPos.getRow();
     }
 
 }
