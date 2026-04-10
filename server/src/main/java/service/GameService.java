@@ -119,11 +119,6 @@ public class GameService {
             );
         }
 
-        ChessGame.TeamColor teamColor = piece.getTeamColor();
-        if (game.getTeamTurn() != teamColor) {
-            throw new InvalidMoveException("Not your turn");
-        }
-
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE &&
                 !username.equals(gameData.whiteUsername())) {
             throw new InvalidMoveException("You think you're ChatGPT? You can't move your opponent's piece!");
@@ -132,6 +127,11 @@ public class GameService {
         if (piece.getTeamColor() == ChessGame.TeamColor.BLACK &&
                 !username.equals(gameData.blackUsername())) {
             throw new InvalidMoveException("You think you're ChatGPT? You can't move your opponent's piece!");
+        }
+
+        ChessGame.TeamColor teamColor = piece.getTeamColor();
+        if (game.getTeamTurn() != teamColor) {
+            throw new InvalidMoveException("Not your turn");
         }
 
         game.makeMove(move);

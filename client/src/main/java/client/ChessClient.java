@@ -25,7 +25,7 @@ public class ChessClient implements NotificationHandler {
     private Integer currentGameID;
     private ChessGame currentGame;
 
-    public ChessClient(String serverURL) throws Exception {
+    public ChessClient(String serverURL) {
         server = new ServerFacade(serverURL);
     }
 
@@ -358,7 +358,7 @@ public class ChessClient implements NotificationHandler {
         return "";
     }
 
-    public String resign(String[] params) throws Exception {
+    public String resign(String[] params)  {
         Scanner scanner = new Scanner(System.in);
         System.out.print(SET_TEXT_COLOR_GREEN + "Are you sure you want to resign? (yes/no): ");
         String response = scanner.nextLine().trim().toLowerCase();
@@ -435,7 +435,7 @@ public class ChessClient implements NotificationHandler {
 
     @Override
     public void notifyError(ErrorMessage errorMessage) {
-        System.out.println("\n" + SET_TEXT_COLOR_RED + "\nError: " + errorMessage.getError());
+        System.out.println("\n" + SET_TEXT_COLOR_RED + "\n" + errorMessage.getError());
         printPrompt();
     }
 
