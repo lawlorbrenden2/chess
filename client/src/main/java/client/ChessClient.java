@@ -329,8 +329,8 @@ public class ChessClient implements NotificationHandler {
     }
 
     public String redrawBoard(String[] params) throws Exception {
-        if (currentGameID == null) {
-            throw new Exception("You haven't joined a game!");
+        if (currentGame == null) {
+            throw new Exception("Board still loading from server, retry");
         }
 
         System.out.println();
@@ -387,9 +387,7 @@ public class ChessClient implements NotificationHandler {
             return SET_TEXT_COLOR_BLUE + "Resignation cancelled";
         }
         ws.sendCommand(new ResignCommand(authToken, currentGameID));
-        state = State.LOGGEDIN;
         int oldGameID = currentGameID;
-        currentGame = null;
         currentGameID = null;
         return SET_TEXT_COLOR_BLUE + "Resigned from game " + oldGameID;
 }

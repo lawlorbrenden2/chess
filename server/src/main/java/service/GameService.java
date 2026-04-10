@@ -126,6 +126,10 @@ public class GameService {
             );
         }
 
+        if (game.isGameOver()) {
+            throw new InvalidMoveException("Game is over");
+        }
+
         ChessGame.TeamColor teamColor = piece.getTeamColor();
         if (game.getTeamTurn() != teamColor) {
             throw new InvalidMoveException("Not your turn");
@@ -141,9 +145,6 @@ public class GameService {
             throw new InvalidMoveException("You think you're ChatGPT? You can't move your opponent's piece!");
         }
 
-        if (game.isGameOver()) {
-            throw new InvalidMoveException("Game is over");
-        }
         game.makeMove(move);
 
         GameData updatedGame = new GameData(
@@ -220,6 +221,32 @@ public class GameService {
         ));
 
         return gameData;
+    }
 
+    public GameData getGameData(String authToken, int gameID)
+            throws UnauthorizedException, BadRequestException, DataAccessException {
+
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        GameData gameData = gameDAO.getGame(gameID);
+        if (gameData == null) {
+            throw new BadRequestException("Error: Bad request");
+        }
+
+        return gameData;
+    }
+
+    public String getUsername(String authToken)
+            throws UnauthorizedException, DataAccessException {
+
+        AuthData authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+
+        return authData.username();
     }
 }

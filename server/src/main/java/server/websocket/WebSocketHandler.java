@@ -1,6 +1,7 @@
 package server.websocket;
 
 
+import chess.ChessGame;
 import chess.ChessPosition;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
@@ -18,16 +19,17 @@ import websocket.messages.*;
 
 import java.time.Duration;
 
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
+
 public class WebSocketHandler {
 
     private final Gson gson = new Gson();
     private final ConnectionManager connectionManager = new ConnectionManager();
-    private final AuthDAO authDAO;
     private final GameService gameService;
 
-    public WebSocketHandler(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
-        this.authDAO = authDAO;
-        this.gameService = new GameService(userDAO, gameDAO, authDAO);
+    public WebSocketHandler(GameService gameService) {
+        this.gameService = gameService;
     }
 
     public void register(Javalin app) {
@@ -69,26 +71,31 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(WsContext ctx, UserGameCommand command) throws DataAccessException {
-        String authToken = command.getAuthToken();
-        AuthData authData = authDAO.getAuth(authToken);
+    private void connect(WsContext ctx, UserGameCommand command) {
+        try {
+            String username = gameService.getUsername(command.getAuthToken());
+            GameData gameData = gameService.getGameData(command.getAuthToken(), command.getGameID());
 
-        if (authData == null) {
-            ctx.send(gson.toJson(new ErrorMessage("Unauthorized")));
-            return;
+            connectionManager.addConnection(ctx, username);
+            connectionManager.addToGame(ctx, command.getGameID());
+
+            ctx.send(gson.toJson(new NotificationMessage("Connected!")));
+            ctx.send(gson.toJson(new LoadGameMessage(gameData.game())));
+
+            String joinMessage = username + " joined the game.";
+            connectionManager.broadcastToGameExceptSender(
+                    command.getGameID(),
+                    ctx,
+                    gson.toJson(new NotificationMessage(joinMessage))
+            );
+        } catch (Exception e) {
+            ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
         }
-
-        String username = authData.username();
-        connectionManager.addConnection(ctx, username);
-        connectionManager.addToGame(ctx, command.getGameID());
-        ctx.send(gson.toJson(new NotificationMessage("Connected!")));
     }
 
     private void makeMove(WsContext ctx, MakeMoveCommand command) {
         try {
-
-            AuthData authData = authDAO.getAuth(command.getAuthToken());
-            String username = (authData != null) ? authData.username() : "Unknown";
+            String username = gameService.getUsername(command.getAuthToken());
             GameData updatedGame = gameService.makeMove(
                     command.getAuthToken(),
                     command.getGameID(),
@@ -106,6 +113,26 @@ public class WebSocketHandler {
                     gson.toJson(new LoadGameMessage(updatedGame.game()))
             );
 
+            ChessGame gameState = updatedGame.game();
+
+            if (gameState.isGameOver()) {
+                if (gameState.isInCheckmate(WHITE)) {
+                    String msg = "Checkmate! " +  updatedGame.blackUsername() + " wins!";
+                    connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
+                } else if (gameState.isInCheckmate(BLACK)) {
+                    String msg = "Checkmate! " +  updatedGame.whiteUsername() + " wins!";
+                    connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
+                }
+                else {
+                    String msg = "Stalemate! The game ends in a draw!";
+                    connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage(msg)));
+                }
+            }
+            if (gameState.isInCheck(WHITE) || gameState.isInCheck(BLACK)) {
+                connectionManager.broadcastToGame(command.getGameID(), gson.toJson(new NotificationMessage("Check!")));
+
+            }
+
         } catch (Exception e) {
             ctx.send(gson.toJson(new ErrorMessage(e.getMessage())));
         }
@@ -114,14 +141,12 @@ public class WebSocketHandler {
     private void leave(WsContext ctx, LeaveCommand command) {
         try {
             String authToken = command.getAuthToken();
-            AuthData authData = authDAO.getAuth(authToken);
-
-            if (authData == null) {
+            String username = gameService.getUsername(command.getAuthToken());
+            if (authToken == null) {
                 ctx.send(gson.toJson(new ErrorMessage("Unauthorized")));
                 return;
             }
 
-            String username = authData.username();
             gameService.leave(authToken, command.getGameID());
             connectionManager.removeConnection(ctx);
             connectionManager.broadcastToGameExceptSender(
@@ -138,20 +163,23 @@ public class WebSocketHandler {
     private void resign(WsContext ctx, ResignCommand command) {
         try {
             String authToken = command.getAuthToken();
-            AuthData authData = authDAO.getAuth(authToken);
+            String username = gameService.getUsername(command.getAuthToken());
 
-            if (authData == null) {
+            if (authToken == null) {
                 ctx.send(gson.toJson(new ErrorMessage("Unauthorized")));
                 return;
             }
 
-            String username = authData.username();
             GameData updatedGame = gameService.resign(authToken, command.getGameID());
+            String winner = username.equals(updatedGame.whiteUsername()) ?
+                    updatedGame.blackUsername() : updatedGame.whiteUsername();
+            String resignMessage = username + " resigned. " + winner + " wins!";
+
             connectionManager.removeConnection(ctx);
             connectionManager.broadcastToGameExceptSender(
                     command.getGameID(),
                     ctx,
-                    gson.toJson(new NotificationMessage(username + " resigned!"))
+                    gson.toJson(new NotificationMessage(resignMessage))
             );
 
             connectionManager.broadcastToGame(
@@ -171,7 +199,9 @@ public class WebSocketHandler {
         char startCol = (char) ('a' + startPos.getColumn() - 1);
         char endCol = (char) ('a' + endPos.getColumn() - 1);
 
-        return "" + startCol + startPos.getRow() + " to " + endCol + endPos.getRow();
+        return "" + startCol + startPos.getRow() + endCol + endPos.getRow();
     }
+
+
 
 }
